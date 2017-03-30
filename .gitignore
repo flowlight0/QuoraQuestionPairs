@@ -1,0 +1,5 @@
+data/input/*
+data/output/*
+data/working/*
+!.gitkeep
+!data/output/*.json

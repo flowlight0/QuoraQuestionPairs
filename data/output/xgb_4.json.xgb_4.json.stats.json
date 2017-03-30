@@ -1,0 +1,42 @@
+{
+    "config": {
+        "data_prefix": "data/input/",
+        "features": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+        ],
+        "model": {
+            "params": {
+                "booster": {
+                    "eta": 0.02,
+                    "eval_metric": "logloss",
+                    "max_depth": 5,
+                    "objective": "binary:logistic"
+                },
+                "train": {
+                    "early_stopping_rounds": 50,
+                    "num_boost_round": 400,
+                    "verbose_eval": 10
+                }
+            },
+            "path": "models/0_xgb.py"
+        }
+    },
+    "results": {
+        "accuracy": 0.8431281946974655,
+        "auc": 0.8474300205879028,
+        "f1_score": 0.18809286784982782,
+        "log_loss": 0.32050847917869135,
+        "precision": 0.6440465462523998,
+        "recall": 0.1101277610660378
+    }
+}
