@@ -8,6 +8,8 @@ import subprocess
 import pandas as pd
 import sys
 
+from sklearn.metrics import log_loss
+
 from features.utils import feature_input_file, generate_filename_from_prefix, feature_output_file
 
 
@@ -56,6 +58,7 @@ def scale_dataset(data, target_positive_ratio=0.165):
     else:
         scaled_data = data
     scaled_data.to_csv(get_tmp_scaled_train_file(), index=False)
+    return scaled_data
 
 
 def check_feature_existence(feature_creator_file, data_prefix):
