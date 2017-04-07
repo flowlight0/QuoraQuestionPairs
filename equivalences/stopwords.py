@@ -5,15 +5,15 @@ from csv import QUOTE_ALL
 from Levenshtein import distance, matching_blocks, editops
 
 def fix(q):
-    return re.findall(r"[a-z][a-z'-]*", q.lower())
+    return re.findall(r"[\w\d][\w\d'-]*", q.lower(), re.UNICODE)
 
 def process(stopwords, anchors, queue, seen=None):
     if not queue:
         return seen
     if seen is None:
         seen = set()
-    # q = [w for w in queue.pop(0) if w not in stopwords]
-    q = queue.pop(0)
+    q = tuple([w for w in queue.pop(0) if w not in stopwords])
+    # q = queue.pop(0)
     while q in seen:
         if not queue:
             return seen
@@ -95,9 +95,9 @@ def main():
             else:
                 cross = sorted([(distance(s1, s2), s1, s2) for s1, s2 in cross], reverse=True)
                 for mindist, s1, s2 in cross[-7:]:
-                    mb = matching_blocks(editops(s1, s2), s1, s2)
-                    print ''.join([s1[x[0]:x[0]+x[2]] for x in mb])
-                    print ''.join([s2[x[1]:x[1]+x[2]] for x in mb])
+                    #mb = matching_blocks(editops(s1, s2), s1, s2)
+                    #print ''.join([s1[x[0]:x[0]+x[2]] for x in mb])
+                    #print ''.join([s2[x[1]:x[1]+x[2]] for x in mb])
                     print ("*" + fmtstring + "      %d") % (s1, s2, mindist)
 
             cmd = raw_input()
