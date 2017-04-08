@@ -18,9 +18,8 @@ def add_feature_importance(bst, log_file: str):
 def main():
     options = common_model_parser().parse_args()
     config = json.load(open(options.config_file))
-    feature_ids = config['features']
-    feature_columns = list(map(lambda s: 'f' + str(s), feature_ids))
     data = pd.read_csv(options.data_file)
+    feature_columns = data.columns[data.columns != 'y']
 
     if options.train:
         train, valid = train_test_split(data, test_size=0.2)

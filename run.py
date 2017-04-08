@@ -39,7 +39,7 @@ def join_dataset(data_file: str, features_ids: list, tmp_file: str, is_train: bo
     if is_train:
         data = pd.read_csv(tmp_file)
         data['y'] = pd.read_csv(data_file)['is_duplicate'].values
-        data.to_csv(get_tmp_train_file(), index=False)
+        data.to_csv(get_tmp_train_file(), index=False, float_format='%.5f')
         return data
     else:
         return pd.read_csv(tmp_file)
@@ -56,7 +56,7 @@ def scale_dataset(data, target_positive_ratio=0.165):
         scaled_data = pd.concat([pos_data, neg_data], ignore_index=True)
     else:
         scaled_data = data
-    scaled_data.to_csv(get_tmp_scaled_train_file(), index=False)
+    scaled_data.to_csv(get_tmp_scaled_train_file(), index=False, float_format='%.5f')
     return scaled_data
 
 
