@@ -51,6 +51,23 @@ def nltk_stemming(data_file):
     return data
 
 
+def nltk_stemming_without_stopwords(data_file):
+    stemmer = nltk.stem.PorterStemmer()
+    cache_file = data_file + '.stemmed.no.stopwords'
+    if os.path.exists(cache_file):
+        return pd.read_csv(cache_file)
+
+    data = nltk_tokenize(data_file)
+    data['question1'] = data['question1'].apply(
+        lambda s: " ".join(stemming_words(str(s).split(), stopwords=[], stemmer=stemmer))
+    ).values
+    data['question2'] = data['question2'].apply(
+        lambda s: " ".join(stemming_words(str(s).split(), stopwords=[], stemmer=stemmer))
+    ).values
+    data.to_csv(cache_file, index=False)
+    return data
+
+
 def nltk_pos_tag(data_file):
     cache_file = data_file + '.pos'
     if os.path.exists(cache_file):
@@ -67,7 +84,8 @@ def sentence2vec(data_file):
     if os.path.exists(cache_file):
         return joblib.load(cache_file)
 
-    model = gensim.models.KeyedVectors.load_word2vec_format('data/input/GoogleNews-vectors-negative300.bin', binary=True)
+    model = gensim.models.KeyedVectors.load_word2vec_format('data/input/GoogleNews-vectors-negative300.bin',
+                                                            binary=True)
     data = nltk_tokenize(data_file)
     question1_vectors = np.zeros((data.shape[0], 300))  # Google's w2v has 300 elements in each feature
     question2_vectors = np.zeros((data.shape[0], 300))  # Google's w2v has 300 elements in each feature

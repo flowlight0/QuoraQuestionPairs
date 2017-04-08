@@ -4,11 +4,9 @@ import json
 import os
 import shlex
 import subprocess
-
-import pandas as pd
 import sys
 
-from sklearn.metrics import log_loss
+import pandas as pd
 
 from features.utils import feature_input_file, generate_filename_from_prefix, feature_output_file
 
@@ -41,6 +39,7 @@ def join_dataset(data_file: str, features_ids: list, tmp_file: str, is_train: bo
     if is_train:
         data = pd.read_csv(tmp_file)
         data['y'] = pd.read_csv(data_file)['is_duplicate'].values
+        data.to_csv(get_tmp_train_file(), index=False)
         return data
     else:
         return pd.read_csv(tmp_file)
@@ -82,7 +81,7 @@ def main():
         subprocess.call(["python3", feature_creator_file, "--data_prefix", config['data_prefix']])
 
     data_files = dict(generate_filename_from_prefix(config['data_prefix']))
-    scale_dataset(join_dataset(data_files['train'], config['features'], get_tmp_train_file(), True))
+    join_dataset(data_files['train'], config['features'], get_tmp_train_file(), True)
 
     model_python = config['model']['path']
 
@@ -90,7 +89,7 @@ def main():
     model_file = os.path.join('data/output', prefix + '.model')
     output_file = os.path.join('data/output', prefix + '.stats.json')
 
-    subprocess.call(['python3', model_python, '--data_file', get_tmp_scaled_train_file(),
+    subprocess.call(['python3', model_python, '--data_file', get_tmp_train_file(),
                      '--config_file', options.config_file, '--model_file', model_file, '--train',
                      '--log_file', output_file])
 

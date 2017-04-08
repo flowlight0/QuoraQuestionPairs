@@ -6,6 +6,7 @@ import xgboost as xgb
 from sklearn.model_selection import train_test_split
 
 from models.utils import common_model_parser, log_result
+from run import scale_dataset
 
 
 def add_feature_importance(bst, log_file: str):
@@ -22,8 +23,11 @@ def main():
     data = pd.read_csv(options.data_file)
 
     if options.train:
-        X_train, X_valid, y_train, y_valid = \
-            train_test_split(data[feature_columns], data['y'], test_size=0.2, random_state=4242)
+        train, valid = train_test_split(data, test_size=0.2)
+        train = scale_dataset(data=train, target_positive_ratio=0.191)
+        valid = scale_dataset(data=valid, target_positive_ratio=0.191)
+        X_train, y_train = train[feature_columns], train['y']
+        X_valid, y_valid = valid[feature_columns], valid['y']
 
         d_train = xgb.DMatrix(X_train, label=y_train)
         d_valid = xgb.DMatrix(X_valid, label=y_valid)
