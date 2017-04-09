@@ -3,3 +3,4 @@ data/output/*
 data/working/*
 !.gitkeep
 !data/output/*.json
+equivalences/.idea
