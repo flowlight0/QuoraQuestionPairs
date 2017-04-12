@@ -1,0 +1,55 @@
+div.item {
+    width: 100%;
+}
+
+div.rule {
+    float: left;
+}
+
+div.counts {
+    /*float: right;*/
+    margin-left: 40%;
+}
+
+div.good-examples {
+    clear: both;
+    background-color: #EEFFEE;
+}
+
+div.bad-examples {
+    clear: both;
+    background-color: #FFEEEE;
+}
+
+div.counts div.positive {
+    color: green;
+}
+
+div.counts div.negative {
+    color: red;
+}
+
+div.q1 {
+    width: 45%;
+    float: left;
+    text-align: right;
+}
+
+div.q2 {
+    margin-left: 55%;
+}
+
+div.q1_simp {
+    width: 40%;
+    float: left;
+    text-align: right;
+}
+
+div.q2_simp {
+    margin-left: 60%;
+}
+
+div.rule-header {
+    margin-left: 40%;
+    margin-right: 40%;
+}

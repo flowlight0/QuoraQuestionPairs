@@ -4,8 +4,7 @@ import {
     Route
 } from 'react-router-dom';
 
-import ArticleList from 'containers/ArticleList';
-import ArticleContent from 'containers/ArticleContent';
+import SuggestedRulesList from 'containers/SuggestedRulesList';
 
 function AppRouter() {
     return (
@@ -14,11 +13,7 @@ function AppRouter() {
                 <Route
                   exact
                   path="/"
-                  component={ArticleList}
-                />
-                <Route
-                  path="/article/:id"
-                  component={ArticleContent}
+                  component={SuggestedRulesList}
                 />
             </div>
         </Router>

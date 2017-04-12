@@ -6,7 +6,7 @@ import { PropTypes } from 'prop-types';
 import * as actions from 'redux/modules/list';
 import List from 'components/List';
 
-class ArticleList extends Component {
+class SuggestedRulesList extends Component {
     static propTypes = {
         actions: PropTypes.shape(),
         list: PropTypes.arrayOf(PropTypes.object)
@@ -17,9 +17,15 @@ class ArticleList extends Component {
         getList();
     }
     render() {
-        const { list } = this.props;
+        const { list, actions } = this.props;
+        const { addRule } = actions;
         return (
-            <List data={list} />
+            <List
+                data={list}
+                onClickAdd={(left, right) => function () {
+                    addRule(left, right);
+                }}
+            />
         );
     }
 }
@@ -36,4 +42,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ArticleList);
+export default connect(mapStateToProps, mapDispatchToProps)(SuggestedRulesList);

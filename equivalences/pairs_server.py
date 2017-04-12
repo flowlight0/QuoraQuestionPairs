@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from tornado.web import RequestHandler, Application
+from tornado.web import RequestHandler, Application, StaticFileHandler
 from tornado.ioloop import IOLoop
 from tornado import gen
 from concurrent.futures import ProcessPoolExecutor
@@ -17,50 +17,73 @@ from find_pairs import find_pairs
 
 executor = None
 df = None
+suggested_future = None
+rules = []
 
-
-def find_pairs_wrapper():
+def find_pairs_wrapper(rules):
     global df
-    return find_pairs(df)
+    counts, good_sources, bad_sources = find_pairs(df, rules)
 
-class IndexHandler(RequestHandler):
+    result = []
+    for ((l, r), c) in sorted(counts.iteritems(), key=lambda (k, v): v, reverse=True):
+        if abs(c[0]) <= 2 and abs(c[1]) <= 2:
+            continue
+        ruleinfo = {
+            "counts": c,
+            "left": l,
+            "right": r,
+            "good_examples": [
+                {
+                    "q1_orig": q1str,
+                    "q2_orig": q2str,
+                    "q1_simp": " ".join(q1t),
+                    "q2_simp": " ".join(q2t)
+                } for (q1str, q2str, q1t, q2t) in good_sources[(l, r)]
+                ],
+            "bad_examples": [
+                {
+                    "q1_orig": q1str,
+                    "q2_orig": q2str,
+                    "q1_simp": " ".join(q1t),
+                    "q2_simp": " ".join(q2t)
+                } for (q1str, q2str, q1t, q2t) in good_sources[(l, r)]
+                ],
+        }
+        result.append(ruleinfo)
+    return json.dumps(result)
+
+class GetSuggestedHandler(RequestHandler):
     @gen.coroutine
     def get(self):
-        global executor, df
+        global suggested_future
+        result = yield suggested_future
         self.set_header('Content-Type', 'application/javascript')
-        counts, good_sources, bad_sources = yield executor.submit(find_pairs_wrapper)
-
-        result = []
-        for ((l, r), c) in sorted(counts.iteritems(), key=lambda (k, v): v, reverse=True):
-            ruleinfo = {
-                "counts": c,
-                "left": l,
-                "right": r,
-                "good_examples": [
-                    {
-                        "q1_orig": q1str,
-                        "q2_orig": q2str,
-                        "q1_simp": " ".join(q1t),
-                        "q2_simp": " ".join(q2t)
-                    } for (q1str, q2str, q1t, q2t) in good_sources[(l, r)]
-                ],
-                "bad_examples": [
-                    {
-                        "q1_orig": q1str,
-                        "q2_orig": q2str,
-                        "q1_simp": " ".join(q1t),
-                        "q2_simp": " ".join(q2t)
-                    } for (q1str, q2str, q1t, q2t) in good_sources[(l, r)]
-                ],
-            }
-            result.append(ruleinfo)
-        self.write(json.dumps(result))
+        self.write(result)
         self.flush()
 
+class AddRuleHandler(RequestHandler):
+    @gen.coroutine
+    def post(self):
+        global rules
+        rule = json.loads(self.request.body)
+        rules.append((tuple(rule["left"]), tuple(rule["right"])))
+
+        global suggested_future
+        suggested_future = executor.submit(find_pairs_wrapper, rules)
+        result = yield suggested_future
+
+        self.set_header('Content-Type', 'application/javascript')
+        self.write(result)
+        self.flush()
+
+STATIC_PATH = os.path.join(os.getcwd(), "www")
 
 application = Application([
-    (r"/", IndexHandler),
-], static_path=os.path.join(os.getcwd(), "static")
+    (r"^/api/suggested", GetSuggestedHandler),
+    (r"^/api/addrule", AddRuleHandler),
+    (r"^/(.*)$", StaticFileHandler, {"path": STATIC_PATH, "default_filename": "index.html"}),
+],
+    static_path=STATIC_PATH
 )
 
 
@@ -71,6 +94,7 @@ if __name__ == "__main__":
     df["question2"].fillna("", inplace=True)
 
     executor = ProcessPoolExecutor(max_workers=3)
+    suggested_future = executor.submit(find_pairs_wrapper, rules)
 
     print "Server reloaded!"
 

@@ -28,26 +28,28 @@ def best_match(stopwords, anchors, q1, q2):
 
     return sorted(cross, key=lambda (s1, s2, t1, t2): distance(s1, s2))[0][2:]
 
+def try_matches(q1, q2, left, right, matches):
+    if right > 0:
+        left_match, right_match = sorted([q1[left:-right], q2[left:-right]])
+    else:
+        left_match, right_match = sorted([q1[left:], q2[left:]])
+    if left_match or right_match:
+        matches.add((left_match, right_match))
 
-def find_pairs(df):
+def build_matches(q1, q2, left, right):
+    matches = set()
+    try_matches(q1, q2, left, right, matches)
+    if left > 0:
+        try_matches(q1, q2, left - 1, right, matches)
+    if right > 0:
+        try_matches(q1, q2, left, right - 1, matches)
+    if left > 0 and right > 0:
+        try_matches(q1, q2, left - 1, right - 1, matches)
+    return matches
+
+def find_pairs(df, rules):
     stopwords = set(['a', 'the', 'an'])
 
-    rules = [
-        (("what's",), ("what", "is")),
-        (("what", "are"), ("what", "is")),
-        (("what", "are", "some"), ("what", "is")),
-
-        (("which", "are"), ("which", "is")),
-        (("which", "are", "some"), ("which", "is")),
-
-        (("which", "is", "best"), ("what", "is")),
-
-        (("how", "can", "i"), ("how", "to")),
-        (("how", "do", "i"), ("how", "to")),
-        (("what", "is", "best", "way", "to"), ("how", "to")),
-
-        (("my",), ()),
-    ]
     anchors = build_anchors(rules)
 
     # rule => set of (q1 orig text, q2 orig text, q1 simplified, q2 simplified)
@@ -60,8 +62,6 @@ def find_pairs(df):
     for line in df.itertuples():
         q1 = fix(stopwords, line.question1)
         q2 = fix(stopwords, line.question2)
-
-        matches = set()
 
         pair = best_match(stopwords, anchors, q1, q2)
         if pair is None:
@@ -77,13 +77,7 @@ def find_pairs(df):
             zip(reversed(q1), reversed(q2))
         )))
 
-        if right > 0:
-            left_match, right_match = sorted([tuple(q1[left:-right]), tuple(q2[left:-right])])
-        else:
-            left_match, right_match = sorted([tuple(q1[left:]), tuple(q2[left:])])
-        if left_match or right_match:
-            matches.add((left_match, right_match))
-
+        matches = build_matches(q1, q2, left, right)
         for key in matches:
             if int(line.is_duplicate):
                 sources = good_sources
