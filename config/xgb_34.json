@@ -1,0 +1,20 @@
+{
+  "data_prefix": "data/input/",
+  "features": [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 21, 22, 25, 26, 28, 30, 31, 32, 44, 45, 46, 47, 58],
+  "model": {
+    "path": "models/0_xgb.py",
+    "params": {
+      "booster": {
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "eta": 0.02,
+        "max_depth": 7
+      },
+      "train": {
+        "num_boost_round": 400,
+        "early_stopping_rounds": 50,
+        "verbose_eval": 10
+      }
+    }
+  }
+}

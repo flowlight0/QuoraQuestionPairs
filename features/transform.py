@@ -3,9 +3,8 @@ import os
 import gensim
 import joblib
 import nltk
-import pandas as pd
 import numpy as np
-from sklearn.decomposition import LatentDirichletAllocation
+import pandas as pd
 from tqdm import tqdm
 
 from features.utils import get_stop_words

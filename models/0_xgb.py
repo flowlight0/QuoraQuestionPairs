@@ -22,7 +22,7 @@ def main():
     feature_columns = data.columns[data.columns != 'y']
 
     if options.train:
-        train, valid = train_test_split(data, test_size=0.2)
+        train, valid = train_test_split(data, test_size=0.2, random_state=334)
         train = scale_dataset(data=train, target_positive_ratio=0.191)
         valid = scale_dataset(data=valid, target_positive_ratio=0.191)
         X_train, y_train = train[feature_columns], train['y']
