@@ -1,0 +1,85 @@
+{
+  "name": "r2-starter-kit",
+  "version": "2.0.0",
+  "description": "R^2 Starter Kit is an boilerplate for web development built on top of React, Redux and Webpack based on Node.js environment, also containing webpack loader such as react-hmr and babel 6.",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development webpack-dev-server --config webpack.config.dev.js",
+    "build": "cross-env NODE_ENV=production webpack -p --config webpack.config.prod.js",
+    "test": "cross-env NODE_ENV=test NODE_PATH=./src jest",
+    "test:cov": "cross-env NODE_ENV=test NODE_PATH=./src jest --coverage",
+    "server": "node server.js",
+    "lint": "eslint $(find src test -name \\*.jsx)",
+    "precommit": "npm run lint",
+    "prepush": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tpai/r2-starter-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tpai/r2-starter-kit/issues"
+  },
+  "author": "tonypai <tony77794@gmail.com> (http://github.com/tpai)",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^6.5.1",
+    "babel-core": "^6.10.4",
+    "babel-jest": "^19.0.0",
+    "babel-loader": "^6.2.4",
+    "babel-polyfill": "^6.7.2",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-react": "^6.23.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "classnames": "^2.2.5",
+    "cross-env": "^3.1.2",
+    "css-loader": "^0.27.3",
+    "es6-promise": "^4.0.5",
+    "express": "^4.14.0",
+    "express-history-api-fallback": "^2.0.0",
+    "husky": "^0.13.2",
+    "isomorphic-fetch": "^2.2.1",
+    "jest": "^19.0.2",
+    "lodash": "^4.12.0",
+    "node-sass": "^4.5.0",
+    "postcss-import": "^9.1.0",
+    "postcss-loader": "^1.3.3",
+    "react": "^15.2.1",
+    "react-dom": "^15.2.1",
+    "react-redux": "^5.0.3",
+    "react-router-dom": "^4.0.0",
+    "react-test-renderer": "^15.4.2",
+    "redux": "^3.5.2",
+    "redux-thunk": "^2.1.0",
+    "sass-loader": "^6.0.3",
+    "style-loader": "^0.15.0",
+    "webpack": "^2.2.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.8.0",
+    "babel-eslint": "^7.0.0",
+    "babel-plugin-rewire": "^1.0.0-rc-1",
+    "commitizen": "^2.8.6",
+    "cz-conventional-changelog": "^2.0.0",
+    "eslint": "^3.7.1",
+    "eslint-loader": "^1.5.0",
+    "eslint-plugin-react": "^6.4.1",
+    "expect": "^1.20.2",
+    "react-hot-loader": "^1.3.0",
+    "redux-logger": "^3.0.0",
+    "validate-commit-msg": "^2.8.2",
+    "webpack-dev-server": "^2.4.2"
+  },
+  "jest": {
+    "collectCoverageFrom" : [
+      "src/components/**/*.{js,jsx}",
+      "src/redux/modules/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
