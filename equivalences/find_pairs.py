@@ -1,4 +1,5 @@
-import sys
+from __future__ import unicode_literals
+
 import pandas
 import re
 import itertools
@@ -9,7 +10,7 @@ from Levenshtein import distance
 
 
 def fix(stopwords, q):
-    return [x for x in re.findall(r"[\w\d][\w\d'-]*", q.lower(), re.UNICODE) if x not in stopwords]
+    return [x for x in re.findall(r"[\w\d][\w\d'-]*", q.decode("utf-8").lower(), re.UNICODE) if x not in stopwords]
 
 
 def best_match(stopwords, anchors, q1, q2):
@@ -49,8 +50,11 @@ def find_pairs(df):
     ]
     anchors = build_anchors(rules)
 
+    # rule => set of (q1 orig text, q2 orig text, q1 simplified, q2 simplified)
     good_sources = defaultdict(set)
+    # rule => set of (q1 orig text, q2 orig text, q1 simplified, q2 simplified)
     bad_sources = defaultdict(set)
+    # rule => [good counts, bad counts]
     counts = {}
 
     for line in df.itertuples():

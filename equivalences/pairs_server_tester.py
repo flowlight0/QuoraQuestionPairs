@@ -4,7 +4,7 @@ import datetime
 
 def run():
     def show_response(res):
-        print datetime.datetime.now().time(), res.body[:100]
+        print datetime.datetime.now().time(), type(res.body) # res.body[:100]
 
     requests = []
     for k in xrange(3):
@@ -23,7 +23,7 @@ def run():
     print '------------------------'
     for req in requests:
         print req
-        http_client.fetch(req, show_response, request_timeout=300)
+        http_client.fetch(req, show_response, request_timeout=600)
 
     # execute requests on server
     print '\n', datetime.datetime.now().time(), 'Start sending requests....'
