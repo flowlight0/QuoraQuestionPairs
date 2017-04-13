@@ -28,6 +28,7 @@ def best_match(stopwords, anchors, q1, q2):
 
     return sorted(cross, key=lambda (s1, s2, t1, t2): distance(s1, s2))[0][2:]
 
+
 def try_matches(q1, q2, left, right, matches):
     if right > 0:
         left_match, right_match = sorted([q1[left:-right], q2[left:-right]])
@@ -35,6 +36,7 @@ def try_matches(q1, q2, left, right, matches):
         left_match, right_match = sorted([q1[left:], q2[left:]])
     if left_match or right_match:
         matches.add((left_match, right_match))
+
 
 def build_matches(q1, q2, left, right):
     matches = set()
@@ -47,6 +49,11 @@ def build_matches(q1, q2, left, right):
         try_matches(q1, q2, left - 1, right - 1, matches)
     return matches
 
+
+def counts_default():
+    return [0, 0]
+
+
 def find_pairs(df, rules):
     stopwords = set(['a', 'the', 'an'])
 
@@ -57,7 +64,7 @@ def find_pairs(df, rules):
     # rule => set of (q1 orig text, q2 orig text, q1 simplified, q2 simplified)
     bad_sources = defaultdict(set)
     # rule => [good counts, bad counts]
-    counts = {}
+    counts = defaultdict(counts_default)
 
     for line in df.itertuples():
         q1 = fix(stopwords, line.question1)
@@ -90,8 +97,6 @@ def find_pairs(df, rules):
 
             if len(sources[key]) < 5:
                 sources[key].add((line.question1, line.question2, q1, q2))
-            if key not in counts:
-                counts[key] = [0, 0]
             counts[key][idx] += c
     return counts, good_sources, bad_sources
 

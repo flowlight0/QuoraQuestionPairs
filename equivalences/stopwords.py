@@ -7,50 +7,51 @@ import heapq
 
 MAX_GENERATION = 5
 
+
 def fix(q):
     return tuple(re.findall(r"[\w\d][\w\d'-]*", q.lower(), re.UNICODE))
+
 
 def process(stopwords, anchors, q):
     assert isinstance(q, tuple)
     return process_impl(stopwords, anchors, [(0, q)])
 
+
 def process_impl(stopwords, anchors, queue, seen=None):
-    if not queue:
-        return seen
-    if seen is None:
-        seen = set()
-    while True:
+    while queue:
+        if seen is None:
+            seen = set()
+
         gen, q = heapq.heappop(queue)
         q = tuple(w for w in q if w not in stopwords)
         if gen >= MAX_GENERATION:
             seen.add(q)
+            continue
         if q in seen:
-            if not queue:
-                return seen
             continue
-        break
-    seen.add(q)
+        seen.add(q)
 
-    good_rules = []
-    for i, w in enumerate(q):
-        if w not in anchors:
-            continue
-        for rule in anchors[w]:
-            apply = True
-            for j in xrange(len(rule[0])):
-                if i + j >= len(q) or rule[0][j] != q[i + j]:
-                    apply = False
-                    break
-            if apply:
-                good_rules.append((i, rule))
+        good_rules = []
+        for i, w in enumerate(q):
+            if w not in anchors:
+                continue
+            for rule in anchors[w]:
+                apply = True
+                for j in xrange(len(rule[0])):
+                    if i + j >= len(q) or rule[0][j] != q[i + j]:
+                        apply = False
+                        break
+                if apply:
+                    good_rules.append((i, rule))
 
-    for gr in good_rules:
-        q1 = list(q)
-        q1[gr[0]:gr[0] + len(gr[1][0])] = list(gr[1][1])
-        q1 = tuple(q1)
-        if q1 not in seen:
-            heapq.heappush(queue, (gen + 1, q1))
-    return process_impl(stopwords, anchors, queue, seen)
+        for gr in good_rules:
+            q1 = list(q)
+            q1[gr[0]:gr[0] + len(gr[1][0])] = list(gr[1][1])
+            q1 = tuple(q1)
+            if q1 not in seen:
+                heapq.heappush(queue, (gen + 1, q1))
+    return seen
+
 
 def build_anchors(rules):
     anchors = dict()
@@ -59,6 +60,7 @@ def build_anchors(rules):
             anchors[r[0][0]] = list()
         anchors[r[0][0]].append(r)
     return anchors
+
 
 def main():
     df = pandas.read_csv(sys.argv[1], quoting=QUOTE_ALL)
@@ -130,6 +132,7 @@ def main():
                 print
                 print rules
                 print
+
 
 if __name__ == "__main__":
     main()
