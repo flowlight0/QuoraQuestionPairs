@@ -1,0 +1,6 @@
+instrumentation:
+  root: src
+  extensions:
+    - .jsx
+    - .js
+  excludes: ['www/dist/*.js']
