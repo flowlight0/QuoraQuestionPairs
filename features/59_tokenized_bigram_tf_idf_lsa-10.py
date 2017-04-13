@@ -7,7 +7,7 @@ from sklearn.decomposition import TruncatedSVD
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import make_pipeline
 
-from features.transform import nltk_stemming, nltk_stemming_without_stopwords
+from features.transform import nltk_tokenize
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
@@ -22,7 +22,7 @@ def create_feature(data_file, vectorizer):
         print('File exists {}.'.format(feature_output_file(data_file)))
         return
 
-    df = nltk_stemming_without_stopwords(data_file)
+    df = nltk_tokenize(data_file)
     print(sys.argv[0], data_file, file=sys.stderr)
     column_name_prefix = 'f{0}'.format(os.path.basename(feature_output_file(data_file)).split('_')[0])
     X1 = vectorizer.transform(df.question1.values.astype(str))
@@ -41,12 +41,12 @@ def create_feature(data_file, vectorizer):
 
 def main():
     options = common_feature_parser().parse_args()
-    df_train = nltk_stemming_without_stopwords(dict(generate_filename_from_prefix(options.data_prefix))['train'])
+    df_train = nltk_tokenize(dict(generate_filename_from_prefix(options.data_prefix))['train'])
 
     train_qs = pd.Series(df_train['question1'].tolist() + df_train['question2'].tolist()).astype(str)
 
     pipeline = make_pipeline(
-        TfidfVectorizer(max_df=0.5, min_df=2, norm='l2'),
+        TfidfVectorizer(max_df=0.5, min_df=2, norm='l2', ngram_range=(1, 2)),
         TruncatedSVD(n_components=10)
     )
     pipeline.fit(train_qs.values)

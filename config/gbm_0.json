@@ -1,0 +1,21 @@
+{
+  "data_prefix": "data/input/",
+  "features": [0, 1, 2, 3],
+  "model": {
+    "path": "models/2_lightgbm.py",
+    "params": {
+      "booster": {
+        "task": "train",
+        "objective": "binary",
+        "metric": "binary_logloss",
+        "num_leaves": 16,
+        "learning_rate": 0.02
+      },
+      "train": {
+        "num_boost_round": 400,
+        "early_stopping_rounds": 50,
+        "verbose_eval": 10
+      }
+    }
+  }
+}
