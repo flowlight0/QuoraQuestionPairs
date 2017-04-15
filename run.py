@@ -70,6 +70,7 @@ def check_feature_existence(feature_creator_file, data_prefix):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file', default='./config/xgb_0.json')
+    parser.add_argument('--train_only', action='store_true')
     options = parser.parse_args()
     config = json.load(open(options.config_file))
 
@@ -93,11 +94,12 @@ def main():
                      '--config_file', options.config_file, '--model_file', model_file, '--train',
                      '--log_file', output_file])
 
-    join_dataset(data_files['test'], config['features'], get_tmp_test_file(), False)
-    submission_file = os.path.join('data/output', prefix + '.submission.csv')
-    subprocess.call(['python3', model_python, '--data_file', get_tmp_test_file(),
-                     '--config_file', options.config_file, '--model_file', model_file,
-                     '--submission_file', submission_file])
+    if not options.train_only:
+        join_dataset(data_files['test'], config['features'], get_tmp_test_file(), False)
+        submission_file = os.path.join('data/output', prefix + '.submission.csv')
+        subprocess.call(['python3', model_python, '--data_file', get_tmp_test_file(),
+                         '--config_file', options.config_file, '--model_file', model_file,
+                         '--submission_file', submission_file])
 
 
 if __name__ == "__main__":

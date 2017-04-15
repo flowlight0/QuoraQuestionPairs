@@ -10,16 +10,19 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import roc_auc_score
 
 
-def log_result(true, pred, config, output_file):
+def log_result(true, pred, config, output_file, weight=None):
+    if weight is None:
+        weight = np.ones(pred.shape)
+
     stats = {
         "results": {
-            "accuracy": accuracy_score(true, pred > 0.5),
-            "precision": precision_score(true, pred > 0.5),
-            "recall": recall_score(true, pred > 0.5),
-            "f1_score": f1_score(true, pred > 0.5),
-            "auc": roc_auc_score(true, pred),
-            "log_loss": log_loss(true, pred),
-            "pred_mean": float(np.mean(pred))
+            "accuracy": accuracy_score(true, pred > 0.5, sample_weight=weight),
+            "precision": precision_score(true, pred > 0.5, sample_weight=weight),
+            "recall": recall_score(true, pred > 0.5, sample_weight=weight),
+            "f1_score": f1_score(true, pred > 0.5, sample_weight=weight),
+            "auc": roc_auc_score(true, pred, sample_weight=weight),
+            "log_loss": log_loss(true, pred, sample_weight=weight),
+            "pred_mean": float(np.dot(pred, weight) / weight.sum())
         },
         "config": config
     }
