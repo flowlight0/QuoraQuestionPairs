@@ -1,9 +1,9 @@
 {
   "data_prefix": "data/input/",
-  "features": [0, 1, 2, 3],
+  "features": [0, 1, 2, 3, 70],
   "model": {
     "path": "models/2_lightgbm.py",
-    "target_positive_ratio": 0.174,
+    "target_positive_ratio": 0.17426506525171756,
     "params": {
       "booster": {
         "task": "train",

@@ -1,0 +1,49 @@
+{
+    "config": {
+        "data_prefix": "data/input/",
+        "features": [
+            0,
+            1,
+            2,
+            3,
+            70
+        ],
+        "model": {
+            "params": {
+                "booster": {
+                    "categorical_column": [],
+                    "learning_rate": 0.02,
+                    "max_bin": 255,
+                    "metric": "binary_logloss",
+                    "num_leaves": 16,
+                    "objective": "binary",
+                    "task": "train",
+                    "verbose": 1
+                },
+                "train": {
+                    "early_stopping_rounds": 50,
+                    "num_boost_round": 400,
+                    "verbose_eval": 10
+                }
+            },
+            "path": "models/2_lightgbm.py",
+            "target_positive_ratio": 0.17426506525171756
+        }
+    },
+    "feature_importance": {
+        "f0": 2601,
+        "f1": 1847,
+        "f2": 274,
+        "f3": 253,
+        "f70": 1025
+    },
+    "results": {
+        "accuracy": 0.8299665622861709,
+        "auc": 0.8283926596331054,
+        "f1_score": 0.14304384946085352,
+        "log_loss": 0.34049721203995537,
+        "precision": 0.5876839076185641,
+        "pred_mean": 0.1745426664324309,
+        "recall": 0.08143235185743476
+    }
+}
