@@ -7,6 +7,7 @@ import pandas as pd
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix, get_stop_words
 
 
+# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def get_weights(train_qs):
     def get_weight(count, eps=10000, min_count=2):
         if count < min_count:

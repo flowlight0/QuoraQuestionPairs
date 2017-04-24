@@ -1,14 +1,15 @@
 import os
+import sys
 
 import numpy as np
 import pandas as pd
-import sys
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from features.transform import nltk_stemming
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
+# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def tfidf_cosine(row):
     print(row['question1'].shape)
     return round(np.dot(row['question1'], row['question2']), 5)

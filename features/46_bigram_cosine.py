@@ -1,7 +1,7 @@
 import os
 import sys
-import numpy as np
 
+import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
@@ -10,6 +10,7 @@ from features.transform import nltk_stemming, nltk_stemming_without_stopwords
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
+# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def calc_feature(row, vectorizer):
     q1 = vectorizer.transform([str(row['question1'])])
     q2 = vectorizer.transform([str(row['question2'])])

@@ -10,6 +10,7 @@ from features.transform import nltk_pos_tag
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
+# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def convert(df: pd.DataFrame):
     df['question1'] = df['question1'].apply(
         lambda stags: " ".join([s for (s, tag) in ast.literal_eval(stags) if tag.startswith('N')])
@@ -34,7 +35,6 @@ def create_feature(data_file, vectorizer: TfidfVectorizer):
     column_name = 'f{0}'.format(os.path.basename(feature_output_file(data_file)).split('_')[0])
     df[column_name] = cosine_values
     df[[column_name]].to_csv(feature_output_file(data_file), index=False, float_format='%.5f')
-
 
 
 def main():

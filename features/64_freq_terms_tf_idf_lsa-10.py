@@ -12,6 +12,7 @@ from features.transform import nltk_tokenize
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
+# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def create_feature(data_file, vectorizer):
     if os.path.exists(feature_output_file(data_file)):
         print('File exists {}.'.format(feature_output_file(data_file)))

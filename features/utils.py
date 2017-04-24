@@ -52,4 +52,6 @@ def generate_filename_from_prefix(prefix: str):
 def common_feature_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_prefix', default='../data/input/', type=str)
+    parser.add_argument('--train_only', action='store_true')
+    parser.add_argument('--n_threads', default=1, type=int)
     return parser

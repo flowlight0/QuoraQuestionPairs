@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 import pandas as pd
+import time
 
 from features.utils import feature_input_file, generate_filename_from_prefix, feature_output_file
 
@@ -79,13 +80,19 @@ def main():
         if check_feature_existence(feature_creator_file, config['data_prefix']):
             print('Feature file for {} exists.'.format(feature_creator_file), file=sys.stderr)
             continue
-        subprocess.call(["python3", feature_creator_file, "--data_prefix", config['data_prefix']])
+        commands = ["python3", feature_creator_file, "--data_prefix", config['data_prefix']]
+        if options.train_only:
+            commands.append("--train_only")
+        subprocess.call(commands)
 
     data_files = dict(generate_filename_from_prefix(config['data_prefix']))
+
+    print("Started generating training dataset from features {}".format(config['features']))
+    start_time = time.time()
     join_dataset(data_files['train'], config['features'], get_tmp_train_file(), True)
+    print("Finished generating training dataset: {:.3f}s".format(time.time() - start_time))
 
     model_python = config['model']['path']
-
     prefix = os.path.basename(options.config_file) + '.{}'.format(os.path.basename(options.config_file))
     model_file = os.path.join('data/output', prefix + '.model')
     output_file = os.path.join('data/output', prefix + '.stats.json')
@@ -95,7 +102,11 @@ def main():
                      '--log_file', output_file])
 
     if not options.train_only:
+        print("Started generating testing dataset from features {}".format(config['features']))
+        start_time = time.time()
         join_dataset(data_files['test'], config['features'], get_tmp_test_file(), False)
+        print("Finished generating testing dataset: {:.3f}s".format(time.time() - start_time))
+
         submission_file = os.path.join('data/output', prefix + '.submission.csv')
         subprocess.call(['python3', model_python, '--data_file', get_tmp_test_file(),
                          '--config_file', options.config_file, '--model_file', model_file,

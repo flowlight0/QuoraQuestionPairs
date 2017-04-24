@@ -9,6 +9,7 @@ from features.transform import nltk_stemming
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
+# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def calc_feature(row, vectorizer):
     m1 = np.sum(vectorizer.transform([str(row['question1'])]).data)
     m2 = np.sum(vectorizer.transform([str(row['question2'])]).data)
@@ -40,6 +41,7 @@ def main():
 
     for k, file_name in generate_filename_from_prefix(options.data_prefix):
         create_feature(data_file=file_name, vectorizer=vectorizer)
+
 
 if __name__ == "__main__":
     main()

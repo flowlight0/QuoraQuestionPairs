@@ -11,6 +11,7 @@ from features.transform import nltk_stemming
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
+# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def calc_feature(row, vectorizer):
     q1 = vectorizer.transform([str(row['question1'])])
     q2 = vectorizer.transform([str(row['question2'])])
