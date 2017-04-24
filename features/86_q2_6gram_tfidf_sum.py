@@ -42,7 +42,7 @@ class WordMatchCount(RowWiseFeatureCreatorBase):
 
     def read_data(self, data_file):
         return np.array(self.vectorizer.transform(nltk_stemming_without_stopwords(data_file)['question2']
-                                                  .fillna("").tolist()).sum(axis=1)).reshape(-1,)
+                                                  .fillna("").tolist()).sum(axis=1)).reshape(-1, )
 
 
 def main():

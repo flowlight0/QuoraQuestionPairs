@@ -64,8 +64,11 @@ class RowWiseFeatureCreatorBase:
               file=sys.stderr)
 
     def create(self):
+        start_time = time.time()
+        print("Start to pre-computation for creating feature {}".format(sys.argv[0]), file=sys.stderr)
         self.prepare()
+        print("Finished to pre-computation for creating feature {}: {:.2f} [s]"
+              .format(sys.argv[0], time.time() - start_time), file=sys.stderr)
         self.create_features(self.input_files['train'])
         if not self.train_only:
             self.create_features(self.input_files['test'])
-

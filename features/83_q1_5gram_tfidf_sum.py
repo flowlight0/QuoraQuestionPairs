@@ -36,7 +36,7 @@ class WordMatchCount(RowWiseFeatureCreatorBase):
         df_test = nltk_stemming_without_stopwords(self.input_files['test'])
         train_qs = pd.Series(df_train['question1'].tolist() +
                              df_train['question2'].tolist() +
-                             df_test['question2'].tolist() +
+                             df_test['question1'].tolist() +
                              df_test['question2'].tolist()).astype(str)
         self.vectorizer.fit(train_qs.values)
 
