@@ -19,7 +19,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
         return data.shape[0]
 
     def calculate_row_feature(self, row):
-        return gbm_25.json
+        return abs(row[0] - row[1])
 
     def calculate_features(self, data):
         values = np.zeros(self.get_num_rows(data))
@@ -48,7 +48,6 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
             self.vectorizer.transform(nltk_stemming_without_stopwords(data_file)['question2'].fillna("").tolist()).sum(
                 axis=1)).reshape(-1, 1)
         return np.hstack((X1, X2))
-
 
 
 def main():

@@ -11,13 +11,6 @@ from features.transform import nltk_stemming
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
-# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
-def calc_feature(row, vectorizer):
-    q1 = vectorizer.transform([str(row['question1'])])
-    q2 = vectorizer.transform([str(row['question2'])])
-    return (q1 * q2.T)[0, 0]
-
-
 def create_feature(data_file, vectorizer):
     if os.path.exists(feature_output_file(data_file)):
         print('File exists {}.'.format(feature_output_file(data_file)))
@@ -43,8 +36,11 @@ def create_feature(data_file, vectorizer):
 def main():
     options = common_feature_parser().parse_args()
     df_train = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['train'])
-
-    train_qs = pd.Series(df_train['question1'].tolist() + df_train['question2'].tolist()).astype(str)
+    df_test = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['test'])
+    train_qs = pd.Series(df_train['question1'].tolist() +
+                         df_train['question2'].tolist() +
+                         df_test['question1'].tolist() +
+                         df_test['question2'].tolist()).astype(str)
 
     pipeline = make_pipeline(
         TfidfVectorizer(max_df=0.5, min_df=2, norm='l2', ngram_range=(1, 2)),
