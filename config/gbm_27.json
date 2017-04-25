@@ -1,0 +1,28 @@
+{
+  "data_prefix": "data/input/",
+  "features": [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 21, 22, 28, 30,
+    31, 32, 44, 45, 46, 47, 57, 60, 64, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 89, 90],
+  "model": {
+    "path": "models/2_lightgbm.py",
+    "target_positive_ratio": 0.17426506525171756,
+    "params": {
+      "booster": {
+        "task": "train",
+        "objective": "binary",
+        "metric": "binary_logloss",
+        "num_leaves": 256,
+        "learning_rate": 0.02,
+        "feature_fraction": 0.7,
+        "feature_fraction_seed": 2,
+        "bagging_fraction": 0.7,
+        "bagging_freq": 5,
+        "bagging_seed": 3
+      },
+      "train": {
+        "num_boost_round": 1000,
+        "early_stopping_rounds": 50,
+        "verbose_eval": 10
+      }
+    }
+  }
+}
