@@ -9,7 +9,7 @@ from features.transform import nltk_stemming
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
-# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
+# NOTE: 90.py should be used instead of this file.
 def tfidf_cosine(row):
     print(row['question1'].shape)
     return round(np.dot(row['question1'], row['question2']), 5)
@@ -36,9 +36,13 @@ def create_feature(data_file, vectorizer: TfidfVectorizer):
 def main():
     options = common_feature_parser().parse_args()
     df_train = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['train'])
-    train_qs = pd.Series(df_train['question1'].tolist() + df_train['question2'].tolist()).astype(str)
+    df_test = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['test'])
+    train_qs = pd.Series(df_train['question1'].tolist() +
+                         df_train['question2'].tolist() +
+                         df_test['question1'].tolist() +
+                         df_test['question2'].tolist()).astype(str)
     vectorizer = TfidfVectorizer(max_df=0.5, min_df=1, norm='l2')
-    vectorizer.fit_transform(train_qs.values)
+    vectorizer.fit(train_qs.values)
 
     for k, file_name in generate_filename_from_prefix(options.data_prefix):
         create_feature(data_file=file_name, vectorizer=vectorizer)

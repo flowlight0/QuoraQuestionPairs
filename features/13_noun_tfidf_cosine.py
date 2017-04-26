@@ -10,7 +10,6 @@ from features.transform import nltk_pos_tag
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
-# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def convert(df: pd.DataFrame):
     df['question1'] = df['question1'].apply(
         lambda stags: " ".join([s for (s, tag) in ast.literal_eval(stags) if tag.startswith('N')])
@@ -41,9 +40,12 @@ def main():
     options = common_feature_parser().parse_args()
     print(sys.argv[0], file=sys.stderr)
     df_train = convert(nltk_pos_tag(dict(generate_filename_from_prefix(options.data_prefix))['train']))
+    df_test = convert(nltk_pos_tag(dict(generate_filename_from_prefix(options.data_prefix))['test']))
     print(df_train.head(), file=sys.stderr)
-
-    train_qs = pd.Series(df_train['question1'].tolist() + df_train['question2'].tolist()).astype(str)
+    train_qs = pd.Series(df_train['question1'].tolist() +
+                         df_train['question2'].tolist() +
+                         df_test['question1'].tolist() +
+                         df_test['question2'].tolist()).astype(str)
     vectorizer = TfidfVectorizer(max_df=0.5, min_df=1, norm='l2')
     vectorizer.fit_transform(train_qs.values)
 

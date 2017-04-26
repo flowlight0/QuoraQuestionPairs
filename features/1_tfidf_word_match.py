@@ -7,7 +7,6 @@ import pandas as pd
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix, get_stop_words
 
 
-# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def get_weights(train_qs):
     def get_weight(count, eps=10000, min_count=2):
         if count < min_count:
@@ -39,7 +38,8 @@ def tfidf_word_match_share(row, weights):
                      [weights.get(w, 0) for w in q2words.keys() if w in q1words]
     total_weights = [weights.get(w, 0) for w in q1words] + [weights.get(w, 0) for w in q2words]
 
-    return np.sum(shared_weights) / np.sum(total_weights)
+    den = np.sum(total_weights)
+    return np.sum(shared_weights) / den if den > 0 else 0
 
 
 def create_word_match_feature(data_file, weights):
@@ -56,7 +56,11 @@ def create_word_match_feature(data_file, weights):
 def main():
     options = common_feature_parser().parse_args()
     df_train = pd.read_csv(dict(generate_filename_from_prefix(options.data_prefix))['train'])
-    train_qs = pd.Series(df_train['question1'].tolist() + df_train['question2'].tolist()).astype(str)
+    df_test = pd.read_csv(dict(generate_filename_from_prefix(options.data_prefix))['test'])
+    train_qs = pd.Series(df_train['question1'].tolist() +
+                         df_train['question2'].tolist() +
+                         df_test['question1'].tolist() +
+                         df_test['question2'].tolist()).astype(str)
     weights = get_weights(train_qs)
     for k, file_name in generate_filename_from_prefix(options.data_prefix):
         create_word_match_feature(data_file=file_name, weights=weights)
