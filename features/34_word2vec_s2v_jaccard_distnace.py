@@ -21,7 +21,6 @@ def create_feature(data_file, model: gensim.models.KeyedVectors):
     df = pd.DataFrame()
     column_name = 'f{0}'.format(os.path.basename(feature_output_file(data_file)).split('_')[0])
     values = []
-    tdqm
     df[column_name] = np.nan_to_num([jaccard(x, y) for (x, y) in zip(np.nan_to_num(question1_vectors),
                                                                      np.nan_to_num(question2_vectors))])
 

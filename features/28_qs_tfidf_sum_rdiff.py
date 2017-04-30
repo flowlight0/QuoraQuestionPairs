@@ -1,6 +1,6 @@
 import os
-
 import sys
+
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -9,12 +9,11 @@ from features.transform import nltk_stemming
 from features.utils import feature_output_file, common_feature_parser, generate_filename_from_prefix
 
 
-# TODO: Fit tf-idf vectorizer on train + test dataset instead of train only
 def calc_feature(row, vectorizer):
     m1 = np.sum(vectorizer.transform([str(row['question1'])]).data)
     m2 = np.sum(vectorizer.transform([str(row['question2'])]).data)
-    if max(m1, m2) > 0:
-        return abs(m1 - m2) / max(m1, m2)
+    if max(abs(m1), abs(m2)) > 0:
+        return abs(m1 - m2) / max(abs(m1), abs(m2))
     else:
         return 0
 
@@ -35,7 +34,11 @@ def main():
     options = common_feature_parser().parse_args()
 
     df_train = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['train'])
-    train_qs = pd.Series(df_train['question1'].tolist() + df_train['question2'].tolist()).astype(str)
+    df_test = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['test'])
+    train_qs = pd.Series(df_train['question1'].tolist() +
+                         df_train['question2'].tolist() +
+                         df_test['question1'].tolist() +
+                         df_test['question2'].tolist()).astype(str)
     vectorizer = TfidfVectorizer(max_df=0.5, min_df=1, norm='l2')
     vectorizer.fit_transform(train_qs.values)
 

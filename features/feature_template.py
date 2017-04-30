@@ -36,7 +36,7 @@ class RowWiseFeatureCreatorBase:
     def calculate_features(self, data):
         pool = Pool(self.n_threads)
         values = np.zeros(self.get_num_rows(data))
-        for i, value in tqdm(enumerate(pool.map(self.calculate_row_feature, self.get_row_wise_iterator(data)))):
+        for i, value in tqdm(enumerate(pool.map(self.calculate_row_feature, self.get_row_wise_iterator(data), chunksize=1000))):
             values[i] = value
         return values
 
