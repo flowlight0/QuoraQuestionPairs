@@ -39,11 +39,14 @@ def create_feature(data_file, vectorizer):
 
 
 def main():
-    return
     options = common_feature_parser().parse_args()
     df_train = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['train'])
+    df_test = nltk_stemming(dict(generate_filename_from_prefix(options.data_prefix))['test'])
+    train_qs = pd.Series(df_train['question1'].tolist() +
+                         df_train['question2'].tolist() +
+                         df_test['question1'].tolist() +
+                         df_test['question2'].tolist()).astype(str)
 
-    train_qs = pd.Series(df_train['question1'].tolist() + df_train['question2'].tolist()).astype(str)
 
     pipeline = make_pipeline(
         TfidfVectorizer(max_df=0.5, min_df=2, norm='l2', ngram_range=(1, 2)),
