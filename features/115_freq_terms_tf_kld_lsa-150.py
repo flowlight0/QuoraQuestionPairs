@@ -69,7 +69,6 @@ def get_test_df(filename):
     df_test = df_test.merge(test_submission, how='inner', on='test_id')
     df_test = df_test[((df_test.is_duplicate < 0.05) & (df_test.is_duplicate > 0.01)) | (df_test.is_duplicate > 0.8)]
     df_test['is_duplicate'] = (df_test.is_duplicate > 0.5).astype(int)
-    print(df_test)
     return df_test
 
 
@@ -81,7 +80,8 @@ def main():
     vectorizer = TfKLdVectorizer(alpha=1, divergence='js', ngram_range=(1, 2), max_df=0.4, min_df=5)
     train_q1s = pd.Series(df_train['question1'].tolist() + df_test['question1'].tolist()).astype(str)
     train_q2s = pd.Series(df_train['question2'].tolist() + df_test['question2'].tolist()).astype(str)
-    vectorizer.fit(train_q1s, train_q2s, df_train['is_duplicate'])
+    train_ys = pd.Series(df_train['is_duplicate'].tolist() + df_test['is_duplicate'].tolist()).astype(int)
+    vectorizer.fit(train_q1s, train_q2s, train_ys)
 
     train_qs = pd.Series(train_q1s.tolist() + train_q2s.tolist()).astype(str)
     value_qs = vectorizer.transform(train_qs)

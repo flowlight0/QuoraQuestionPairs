@@ -70,7 +70,6 @@ class TfKLdTransformer:
     def _fit(self, X1: scipy.sparse.csc.csc_matrix, X2: scipy.sparse.csc.csc_matrix, y):
         w = np.zeros((X1.shape[1],))
         for i in range(X1.shape[1]):
-            print(i, X1.shape[1])
             rows, cols = X1.getcol(i).nonzero()
             tmp_x = np.array(X2.getcol(i)[rows, cols]).flatten()
             tmp_y = y[rows]
