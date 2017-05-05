@@ -85,9 +85,10 @@ def main():
 
     train_qs = pd.Series(train_q1s.tolist() + train_q2s.tolist()).astype(str)
     value_qs = vectorizer.transform(train_qs)
+    print(value_qs)
 
     pipeline = make_pipeline(
-        TruncatedSVD(n_components=150)
+        TruncatedSVD(n_components=10)
     )
     pipeline.fit(value_qs)
 

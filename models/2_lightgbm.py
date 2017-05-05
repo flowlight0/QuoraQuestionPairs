@@ -3,6 +3,7 @@ import json
 import joblib
 import pandas as pd
 import numpy as np
+import sys
 from sklearn.model_selection import train_test_split
 
 import lightgbm as lgb
@@ -20,6 +21,8 @@ def main():
     config = json.load(open(options.config_file))
     data = pd.read_csv(options.data_file)
     feature_columns = data.columns[data.columns != 'y']
+    categorical_feature_columns = [feature for feature in feature_columns if feature.endswith('.cat')]
+    print("Categorical features: {}".format(categorical_feature_columns), file=sys.stderr)
 
     if options.train:
         train, valid = train_test_split(data, test_size=0.2, random_state=334, stratify=data.y)
@@ -32,8 +35,10 @@ def main():
         w_valid = np.ones(X_valid.shape[0])
         w_valid[y_valid == 0] *= negative_weight
 
-        d_train = lgb.Dataset(data=X_train, label=y_train, weight=w_train)
-        d_valid = lgb.Dataset(data=X_valid, label=y_valid, weight=w_valid)
+        d_train = lgb.Dataset(data=X_train, label=y_train, weight=w_train,
+                              categorical_feature=categorical_feature_columns)
+        d_valid = lgb.Dataset(data=X_valid, label=y_valid, weight=w_valid,
+                              categorical_feature=categorical_feature_columns)
         params = config['model']['params']
         gbm = lgb.train(params['booster'], d_train, valid_sets=d_valid, **params['train'])
         joblib.dump(gbm, options.model_file)
