@@ -9,7 +9,7 @@ from sklearn.utils.validation import check_is_fitted
 
 class TfKLdVectorizer:
     def __init__(self, input='content', encoding='utf-8',
-                 decode_error='strict', strip_accents=None,
+        decode_error='strict', strip_accents=None,
                  lowercase=True, preprocessor=None, tokenizer=None,
                  stop_words=None, token_pattern=r"(?u)\b\w\w+\b",
                  ngram_range=(1, 1), analyzer='word',
@@ -79,8 +79,6 @@ class TfKLdTransformer:
     def _weight(self, dist_p, dist_q):
         p = ((dist_p > 0).sum() + self.alpha) / (dist_p.shape[0] + self.alpha * 2)
         q = ((dist_q > 0).sum() + self.alpha) / (dist_q.shape[0] + self.alpha * 2)
-        print(p, q)
-        print(p * math.log(p / q) + (1 - p) * math.log((1 - p) / (1 - q)))
         if self.divergence == 'kl':
             return p * math.log(p / q) + (1 - p) * math.log((1 - p) / (1 - q))
         elif self.divergence == 'js':
@@ -91,7 +89,6 @@ class TfKLdTransformer:
                     q * math.log(q / r) + (1 - q) * math.log((1 - q) / (1 - r))) / 2
 
     def transform(self, X):
-        print(self.weight)
         weight_diag = scipy.sparse.diags(self.weight.ravel(), shape=(X.shape[1], X.shape[1]), dtype=np.float32)
         X = X * weight_diag
         if self.norm:

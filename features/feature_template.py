@@ -36,9 +36,13 @@ class RowWiseFeatureCreatorBase:
     def calculate_features(self, data):
         pool = Pool(self.n_threads)
         values = np.zeros(self.get_num_rows(data))
-        for i, value in tqdm(enumerate(pool.map(self.calculate_row_feature, self.get_row_wise_iterator(data), chunksize=1000))):
+        for i, value in tqdm(
+                enumerate(pool.map(self.calculate_row_feature, self.get_row_wise_iterator(data), chunksize=1000))):
             values[i] = value
         return values
+
+    def get_column_name(self, input_file):
+        return 'f{0}'.format(os.path.basename(feature_output_file(input_file)).split('_')[0])
 
     def create_features(self, input_file):
         output_file = feature_output_file(input_file)
@@ -56,12 +60,14 @@ class RowWiseFeatureCreatorBase:
 
         start_time = time.time()
         print("Start to write features {} {}".format(sys.argv[0], input_file), file=sys.stderr)
-        column_name = 'f{0}'.format(os.path.basename(feature_output_file(input_file)).split('_')[0])
+        self.write_feature(column_name=self.get_column_name(input_file), output_file=output_file, values=values)
+        print("Finished to write features {} {}: {:.2f} [s]".format(sys.argv[0], input_file, time.time() - start_time),
+              file=sys.stderr)
+
+    def write_feature(self, column_name, output_file, values):
         df = pd.DataFrame()
         df[column_name] = values
         df[[column_name]].to_csv(output_file, index=False, float_format='%.5f')
-        print("Finished to write features {} {}: {:.2f} [s]".format(sys.argv[0], input_file, time.time() - start_time),
-              file=sys.stderr)
 
     def create(self):
         start_time = time.time()

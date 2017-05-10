@@ -43,8 +43,8 @@ def main():
                          df_test['question2'].tolist()).astype(str)
 
     pipeline = make_pipeline(
-        TfidfVectorizer(max_df=0.5, min_df=2, norm='l2', ngram_range=(1, 2)),
-        TruncatedSVD(n_components=50)
+        TfidfVectorizer(max_df=0.5, min_df=2, norm='l2', ngram_range=(1, 2), dtype=np.float32),
+        TruncatedSVD(n_components=50, n_iter=10)
     )
     pipeline.fit(train_qs.values)
 
