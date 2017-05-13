@@ -9,7 +9,7 @@ from sklearn.utils.validation import check_is_fitted
 
 class TfKLdVectorizer:
     def __init__(self, input='content', encoding='utf-8',
-        decode_error='strict', strip_accents=None,
+                 decode_error='strict', strip_accents=None,
                  lowercase=True, preprocessor=None, tokenizer=None,
                  stop_words=None, token_pattern=r"(?u)\b\w\w+\b",
                  ngram_range=(1, 1), analyzer='word',
