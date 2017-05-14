@@ -43,8 +43,8 @@ def main():
                          df_test['question2'].tolist()).astype(str)
 
     pipeline = make_pipeline(
-        TfidfVectorizer(max_df=0.5, min_df=2, norm='l2'),
-        NMF(n_components=10, random_state=1, l1_ratio=.15)
+        TfidfVectorizer(max_df=0.5, min_df=2, norm='l2', dtype=np.int32),
+        NMF(n_components=150, random_state=1, l1_ratio=.15)
     )
     pipeline.fit(train_qs.values)
 
