@@ -102,7 +102,7 @@
     "uncommon_not_in_word2vec",
 
     "fm",
-    "fm_2grams",
+    "fm_2grams"
   ],
   "model": {
     "path": "models/2_lightgbm.py",
