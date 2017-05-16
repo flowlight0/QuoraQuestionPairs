@@ -62,7 +62,7 @@
     "q1_words_not_in_word2vec",
     "q2_words_not_in_word2vec",
 
-    "uncommon_not_in_word2vec",
+    "uncommon_not_in_word2vec"
   ],
   "model": {
     "path": "models/2_lightgbm.py",
