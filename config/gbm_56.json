@@ -1,0 +1,28 @@
+{
+  "data_prefix": "data/input/",
+  "features": [0, 1, 2, 117],
+  "model": {
+    "path": "models/2_lightgbm.py",
+    "target_positive_ratio": 0.17426506525171756,
+    "params": {
+      "booster": {
+        "task": "train",
+        "objective": "binary",
+        "metric": "binary_logloss",
+        "num_leaves": 64,
+        "max_depth": 10,
+        "learning_rate": 0.02,
+        "feature_fraction": 0.7,
+        "feature_fraction_seed": 2,
+        "bagging_fraction": 0.7,
+        "bagging_freq": 5,
+        "bagging_seed": 3
+      },
+      "train": {
+        "num_boost_round": 1000,
+        "early_stopping_rounds": 50,
+        "verbose_eval": 10
+      }
+    }
+  }
+}
