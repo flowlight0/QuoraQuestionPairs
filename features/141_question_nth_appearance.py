@@ -27,7 +27,7 @@ def calculate_features(df, counter):
     for i, row in tqdm(df.iterrows()):
         values.append([counter[row['question1']], counter[row['question2']]])
         counter[row['question1']] += 1
-        counter[row['question1']] += 1
+        counter[row['question2']] += 1
     return pd.DataFrame(data=values, columns=[feature_id + '.q1', feature_id + '.q2'])
 
 
