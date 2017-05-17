@@ -23,7 +23,7 @@ def create_feature(data_file, features: pd.DataFrame):
 
 def calculate_features(df, counter):
     values = []
-    feature_id = 'f' + os.path.basename(str(__file__)).split("_")[0]
+    feature_id = 'f' + os.path.basename(str(__file__)).split("_")[0] + '.cat'
     for i, row in tqdm(df.iterrows()):
         values.append([1 if (counter[row['question1']] == 0 and counter[row['question2']] == 0) else 0])
         counter[row['question1']] += 1
