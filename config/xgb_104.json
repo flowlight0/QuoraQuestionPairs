@@ -1,0 +1,29 @@
+{
+  "data_prefix": "data/input/",
+  "features": [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 21, 22, 28, 30,
+    31, 32, 44, 45, 46, 47, 57, 60, 64, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 91, 92, 93, 109, 110, 111, 112,
+    117, 118, 119, 137, 141, 143, 144],
+  "model": {
+    "path": "models/3_xgb.py",
+    "target_positive_ratio": 0.17426506525171756,
+    "params": {
+      "booster": {
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "eta": 0.04,
+        "max_depth": 6,
+        "min_child_weight": 1,
+        "colsample_bytree": 0.5,
+        "subsample": 0.7,
+        "silent": 0,
+        "seed": 87978979,
+        "gamma": 1
+      },
+      "train": {
+        "num_boost_round": 114514,
+        "early_stopping_rounds": 50,
+        "verbose_eval": 10
+      }
+    }
+  }
+}
