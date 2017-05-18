@@ -1,7 +1,7 @@
 {
   "data_prefix": "data/input/",
-  "features": [],
-  "takapt_features": [
+  "features": [141],
+    "takapt_features": [
         "z_noun_match",
     "z_len1",
     "z_len2",
@@ -100,41 +100,26 @@
     "uncommon_not_in_word2vec",
 
     "fm",
-    "fm_2grams",
-
-    "clean_lemm_stem_len1",
-    "clean_lemm_stem_len2",
-    "clean_lemm_stem_word_len1",
-    "clean_lemm_stem_word_len2",
-    "clean_lemm_stem_match_ratio",
-    "clean_lemm_stem_word_match",
-    "clean_lemm_stem_word_match_idf",
-    "clean_lemm_stem_tfidf_sum1",
-    "clean_lemm_stem_tfidf_sum2",
-    "clean_lemm_stem_tfidf_mean1",
-    "clean_lemm_stem_tfidf_mean2",
-    "clean_lemm_stem_tfidf_len1",
-    "clean_lemm_stem_tfidf_len2"
+    "fm_2grams"
   ],
   "model": {
-    "path": "models/2_lightgbm.py",
+    "path": "models/3_xgb.py",
     "target_positive_ratio": 0.17426506525171756,
     "params": {
       "booster": {
-        "task": "train",
-        "objective": "binary",
-        "metric": "binary_logloss",
-        "num_leaves": 64,
-        "max_depth": 8,
-        "learning_rate": 0.02,
-        "feature_fraction": 0.5,
-        "feature_fraction_seed": 2,
-        "bagging_fraction": 0.5,
-        "bagging_freq": 5,
-        "bagging_seed": 3
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "eta": 0.04,
+        "max_depth": 6,
+        "min_child_weight": 1,
+        "colsample_bytree": 0.5,
+        "subsample": 0.7,
+        "silent": 0,
+        "seed": 87978979,
+        "gamma": 1
       },
       "train": {
-        "num_boost_round": 10000,
+        "num_boost_round": 114514,
         "early_stopping_rounds": 50,
         "verbose_eval": 10
       }
