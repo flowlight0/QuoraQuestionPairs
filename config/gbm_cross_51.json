@@ -6,7 +6,7 @@
 
   "model": {
     "path": "models/4_lightgbm_cross.py",
-    "target_positive_ratio": 0.165, 
+    "target_positive_ratio": 0.165,
     "params": {
       "booster": {
         "task": "train",
