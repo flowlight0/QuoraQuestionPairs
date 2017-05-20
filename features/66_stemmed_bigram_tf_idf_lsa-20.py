@@ -44,7 +44,7 @@ def main():
 
     pipeline = make_pipeline(
         TfidfVectorizer(max_df=0.5, min_df=2, norm='l2', ngram_range=(1, 2)),
-        TruncatedSVD(n_components=20, n_iter=)
+        TruncatedSVD(n_components=20, n_iter=10)
     )
     pipeline.fit(train_qs.values)
 
