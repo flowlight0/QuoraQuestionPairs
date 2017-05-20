@@ -11,9 +11,19 @@ from sklearn.metrics import roc_auc_score
 
 
 def log_result(true, pred, config, output_file, weight=None):
+    stats = calculate_statistics(pred, true, weight)
+    print(stats)
+    write_statistics(stats, config, output_file)
+
+
+def write_statistics(stats, config, output_file):
+    stats["config"] = config
+    json.dump(stats, open(output_file, 'w'), sort_keys=True, indent=4)
+
+
+def calculate_statistics(pred, true, weight):
     if weight is None:
         weight = np.ones(pred.shape)
-
     stats = {
         "results": {
             "accuracy": accuracy_score(true, pred > 0.5, sample_weight=weight),
@@ -24,10 +34,8 @@ def log_result(true, pred, config, output_file, weight=None):
             "log_loss": log_loss(true, pred, sample_weight=weight),
             "pred_mean": float(np.dot(pred, weight) / weight.sum())
         },
-        "config": config
     }
-    print(stats)
-    json.dump(stats, open(output_file, 'w'), sort_keys=True, indent=4)
+    return stats
 
 
 def common_model_parser():
