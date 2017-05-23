@@ -1,22 +1,21 @@
 import os
 
-import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 from features.feature_template import RowWiseFeatureCreatorBase
-from features.graph_dumper import get_node_filename, get_edge_filename
+from features.graph_dumper import get_node_filename, get_edge_filename, dump_graph
 from features.utils import common_feature_parser, feature_output_file
 
 
 class FeatureCreator(RowWiseFeatureCreatorBase):
     def __init__(self, options):
         super().__init__(options)
+        dump_graph(options)
         self.node_filename = get_node_filename(options)
         self.edge_filename = get_edge_filename(options)
         self.topk_filename = options.data_prefix + 'graph.top_32'
-        if not os.path.exists(self.node_filename) or not os.path.exists(self.edge_filename) or not os.path.exists(
-                self.topk_filename):
+
+        if not os.path.exists(self.topk_filename):
             raise FileNotFoundError("You should create graph before using this script. "
                                     "Please ask takanori about how to generate graph files")
         self.features = {}

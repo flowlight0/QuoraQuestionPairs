@@ -1,3 +1,5 @@
+import os
+
 import joblib
 import pandas as pd
 from tqdm import tqdm
@@ -8,15 +10,20 @@ from features.utils import common_feature_parser, generate_filename_from_prefix
 def main():
     parser = common_feature_parser()
     options = parser.parse_args()
+    dump_graph(options)
+
+
+def dump_graph(options):
+    node_file = get_node_filename(options)
+    edge_file = get_edge_filename(options)
+    if os.path.exists(node_file) and os.path.exists(edge_file):
+        print("File exists {} and {}".format(node_file, edge_file))
+        return
 
     train_df = pd.read_csv(dict(generate_filename_from_prefix(options.data_prefix))['train'])
     test_df = pd.read_csv(dict(generate_filename_from_prefix(options.data_prefix))['test'])
-
     edges, question2id = build_graph(test_df, train_df)
-    node_file = get_node_filename(options)
     dump_load_file(node_file, question2id)
-
-    edge_file = get_edge_filename(options)
     with open(edge_file, 'w') as f:
         for e in edges:
             print(e, file=f)
