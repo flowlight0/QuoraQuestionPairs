@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -18,7 +19,11 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
     def calculate_row_feature(self, row):
         q1 = str(row[1]['question1'])
         q2 = str(row[1]['question2'])
-        return len(self.neighbor_sets[q1]) * len(self.neighbor_sets[q2])
+        inter = self.neighbor_sets[q1].intersection(self.neighbor_sets[q2])
+        value = 0
+        for v in inter:
+            value += 1 / math.log(len(self.neighbor_sets[v]) + 1)
+        return value
 
     def calculate_features(self, data):
         values = np.zeros(self.get_num_rows(data))
