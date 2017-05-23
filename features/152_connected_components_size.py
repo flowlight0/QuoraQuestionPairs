@@ -45,7 +45,7 @@ def calculate_features(df, uf: UnionFind):
     values = []
     feature_id = 'f' + os.path.basename(str(__file__)).split("_")[0]
     for i, row in tqdm(df.iterrows()):
-        values.append(uf.size[str(row['question1'])])
+        values.append(uf.size[uf.find(str(row['question1']))])
     return pd.DataFrame(data=values, columns=[feature_id])
 
 
