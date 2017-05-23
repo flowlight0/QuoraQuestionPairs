@@ -23,7 +23,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
         if q1 in self.value_cache:
             return self.value_cache[q1]
 
-        size = float(len(q1))
+        size = len(self.neighbor_sets[q1])
         if size < 2:
             return 0
         else:
