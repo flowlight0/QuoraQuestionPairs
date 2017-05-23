@@ -11,6 +11,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
     def __init__(self, options):
         super().__init__(options)
         self.neighbor_sets = {}
+        self.value_cache = {}
 
     @staticmethod
     def get_num_rows(data):
@@ -18,6 +19,10 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
 
     def calculate_row_feature(self, row):
         q1 = str(row[1]['question2'])
+
+        if q1 in self.value_cache:
+            return self.value_cache[q1]
+
         size = float(len(q1))
         if size < 2:
             return 0
@@ -26,7 +31,9 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
             for q2, q3 in itertools.combinations(self.neighbor_sets[q1], 2):
                 if q2 in self.neighbor_sets[q3]:
                     count += 1
-            return 2.0 * count / ((size - 1) * size)
+            answer = 2.0 * count / ((size - 1) * size)
+            self.value_cache[q1] = answer
+            return answer
 
     def calculate_features(self, data):
         values = np.zeros(self.get_num_rows(data))
