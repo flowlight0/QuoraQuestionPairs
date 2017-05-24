@@ -43,6 +43,8 @@ creator = DependencyNgramsCreator()
 def create_common_ngrams_ratio_feature(q1, q2, n, skip_stopwords):
     q1_ngrams = creator.list_ngrams(q1, n, skip_stopwords)
     q2_ngrams = creator.list_ngrams(q2, n, skip_stopwords)
+    if not q1_ngrams or not q2_ngrams:
+        return 0
 
     common = q1_ngrams & q2_ngrams
     union = q1_ngrams | q2_ngrams
@@ -69,12 +71,12 @@ def main():
     output_path = '../feature'
     
     train = pd.read_csv(os.path.join(input_path, 'train.csv'))#[:100]
-    train_feature = create_df(train, 'id', 'dep_2grams_common_ratio', n=2, skip_stopwords=False)
-    train_feature.to_pickle(os.path.join(output_path, 'train_{}.pkl'.format('dep_2grams_common_ratio')))
+    train_feature = create_df(train, 'id', 'dep_2grams_common_ratio_stop', n=2, skip_stopwords=True)
+    train_feature.to_pickle(os.path.join(output_path, 'train_{}.pkl'.format('dep_2grams_common_ratio_stop')))
     
     test = pd.read_csv(os.path.join(input_path, 'test.csv'))#[:100]
-    test_feature = create_df(test, 'test_id', 'dep_2grams_common_ratio', n=2, skip_stopwords=False)
-    test_feature.to_pickle(os.path.join(output_path, 'test_{}.pkl'.format('dep_2grams_common_ratio')))
+    test_feature = create_df(test, 'test_id', 'dep_2grams_common_ratio_stop', n=2, skip_stopwords=True)
+    test_feature.to_pickle(os.path.join(output_path, 'test_{}.pkl'.format('dep_2grams_common_ratio_stop')))
 
 if __name__ == "__main__":
     main()
