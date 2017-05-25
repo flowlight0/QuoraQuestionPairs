@@ -1,5 +1,5 @@
+import gensim
 import numpy as np
-from gensim.models.wrappers import FastText
 from scipy.spatial.distance import euclidean
 from tqdm import tqdm
 
@@ -61,7 +61,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
         return data.iterrows()
 
     def prepare(self):
-        self.model = FastText.load_fasttext_format('data/input/wiki.en')
+        self.model = gensim.models.KeyedVectors.load_word2vec_format('data/input/wiki.en', binary=False)
 
     def read_data(self, data_file):
         return nltk_tokenize(data_file)
