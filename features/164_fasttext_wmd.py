@@ -33,7 +33,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
         return data.iterrows()
 
     def prepare(self):
-        self.model = gensim.models.KeyedVectors.load_word2vec_format('data/input/wiki.en', binary=False)
+        self.model = gensim.models.KeyedVectors.load_word2vec_format('data/input/wiki.en.vec', binary=False)
 
     def read_data(self, data_file):
         return nltk_tokenize(data_file)
