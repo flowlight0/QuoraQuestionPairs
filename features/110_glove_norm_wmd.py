@@ -34,6 +34,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
 
     def prepare(self):
         self.model = gensim.models.KeyedVectors.load_word2vec_format('data/input/glove.840B.300d.bin', binary=True)
+        self.model.init_sims(replace=True)
 
 
     def read_data(self, data_file):
