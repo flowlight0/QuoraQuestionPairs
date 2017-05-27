@@ -58,6 +58,11 @@ def main():
         log_result(y_valid, p_valid, config, options.log_file, weight=w_valid)
         add_feature_importance(gbm, options.log_file)
         add_train_score(y_train=y_train, p_train=p_train, log_file=options.log_file, weight=w_train)
+
+        temp_df = pd.DataFrame()
+        temp_df['is_duplicate'] = gbm.predict(data[feature_columns])
+        temp_df[['is_duplicate']].to_csv(options.submission_file + ".train.pred.csv", index_label='id')
+
     else:
         gbm = joblib.load(options.model_file)
         data['is_duplicate'] = gbm.predict(data[feature_columns])
