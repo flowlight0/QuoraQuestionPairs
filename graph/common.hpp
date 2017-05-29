@@ -7,6 +7,7 @@
 #define fst first
 #define snd second
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <vector>
 
@@ -25,6 +26,17 @@ template <typename T> std::ostream &operator<<(std::ostream &out, const std::vec
   out << "]";
   return out;
 }
+
+
+int readGraph(std::ifstream &ifs, std::vector<std::pair<int, int> > &es) {
+  int u, v, V = 0;
+  while (ifs >> u >> v) {
+    V = std::max({u, v, V + 1});
+    es.push_back(std::make_pair(u, v));
+  }
+  return V;
+}
+
 
 
 #endif /* COMMON_H */
