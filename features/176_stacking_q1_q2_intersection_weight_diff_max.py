@@ -27,7 +27,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
             intersect = q1_neighbors.intersection(q2_neighbors)
             if len(intersect) > 0:
                 values[i] = np.max([max(self.neighbor_weights[q1][q] * (1 - self.neighbor_weights[q2][q]),
-                                        (1 - self.neighbor_weights[q1][q]) * self.neighbor_weights[q2][q]) for q in intersect]),
+                                        (1 - self.neighbor_weights[q1][q]) * self.neighbor_weights[q2][q]) for q in intersect])
             else:
                 values[i] = -1
         return values
