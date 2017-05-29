@@ -30,7 +30,7 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
         return data.iterrows()
 
     def prepare(self):
-        binary_file = '../graph/spanning_edge_centrality_feature_main'
+        binary_file = os.path.join(__file__, '../graph/spanning_edge_centrality_feature_main')
         program_file = binary_file + '.cpp'
         temp_file = __file__ + '.feature.tmp'
         commands = ['g++', '-O3', '-std=c++11', program_file, '-o', binary_file]
