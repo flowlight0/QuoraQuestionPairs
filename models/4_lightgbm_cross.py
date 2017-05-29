@@ -59,7 +59,8 @@ def main():
 
             p_train = gbm.predict(X_train, num_iteration=gbm.best_iteration)
             p_valid = gbm.predict(X_valid, num_iteration=gbm.best_iteration)
-            data.ix[valid]['prediction'] = p_valid
+            data.ix[valid, 'prediction'] = p_valid
+           
             stat = calculate_statistics(pred=p_valid, true=y_valid, weight=w_valid)
             stat['results']['train_log_loss'] = log_loss(y_train, p_train, sample_weight=w_train)
             stats["results"].append(stat["results"])
