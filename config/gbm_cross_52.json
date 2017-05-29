@@ -1,4 +1,3 @@
-
 {
   "data_prefix": "data/input/",
   "features": [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 21, 22, 28, 30,
@@ -103,9 +102,8 @@
     "clean_lemm_stem_tfidf_len1",
     "clean_lemm_stem_tfidf_len2"
   ],
-
   "model": {
-    "path": "models/2_lightgbm.py",
+    "path": "models/4_lightgbm_cross.py",
     "target_positive_ratio": 0.17426506525171756,
     "params": {
       "booster": {
@@ -118,8 +116,7 @@
         "feature_fraction_seed": 2,
         "bagging_fraction": 0.7,
         "bagging_freq": 5,
-        "bagging_seed": 3,
-        "lambda_l2": 1
+        "bagging_seed": 3
       },
       "train": {
         "num_boost_round": 1000,
