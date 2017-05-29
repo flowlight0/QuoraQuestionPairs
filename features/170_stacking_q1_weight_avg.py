@@ -49,6 +49,8 @@ class FeatureCreator(RowWiseFeatureCreatorBase):
             for i, (q1, q2, value) in tqdm(enumerate(zip(df.question1.astype(str), df.question2.astype(str), df.prob))):
                 self.neighbor_sets[q1].add(q2)
                 self.neighbor_weights[q1][q2] = value
+                self.neighbor_sets[q2].add(q1)
+                self.neighbor_weights[q2][q1] = value
 
     def read_data(self, data_file):
         return pd.read_csv(data_file)
