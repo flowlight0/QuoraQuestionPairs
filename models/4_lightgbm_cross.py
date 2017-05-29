@@ -8,7 +8,7 @@ from sklearn.metrics import log_loss
 from sklearn.model_selection import StratifiedKFold
 
 import lightgbm as lgb
-from models.utils import common_model_parser, log_result, calculate_statistics
+from models.utils import common_model_parser, calculate_statistics
 
 
 def add_feature_importance(bst, log_file: str):
@@ -21,7 +21,6 @@ def add_train_score(y_train, p_train, log_file: str, weight):
     log_data = json.load(open(log_file))
     log_data['results']['train_log_loss'] = log_loss(y_train, p_train, sample_weight=weight)
     print(log_data)
-
 
 
 def main():
@@ -38,6 +37,7 @@ def main():
 
         models = []
         stats = {"results": [], "config": config}
+        data['prediction'] = [0] * data.shape[0]
         for train, valid in skf.split(data[feature_columns], data['y']):
             train_data = data.ix[train]
             valid_data = data.ix[valid]
@@ -59,10 +59,12 @@ def main():
 
             p_train = gbm.predict(X_train, num_iteration=gbm.best_iteration)
             p_valid = gbm.predict(X_valid, num_iteration=gbm.best_iteration)
+            data.ix[valid]['prediction'] = p_valid
             stat = calculate_statistics(pred=p_valid, true=y_valid, weight=w_valid)
             stat['results']['train_log_loss'] = log_loss(y_train, p_train, sample_weight=w_train)
             stats["results"].append(stat["results"])
         joblib.dump(models, options.model_file)
+        data[['prediction']].to_csv(options.model_file + '.train.pred', index=False)
         json.dump(stats, open(options.log_file, 'w'), sort_keys=True, indent=4)
     else:
         models = joblib.load(options.model_file)
