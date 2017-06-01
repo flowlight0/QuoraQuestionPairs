@@ -49,6 +49,7 @@ TRAIN_DATA_CACHE_FILE_1 = BASE_DIR + 'train.csv.1.cache.pkl'
 TRAIN_DATA_CACHE_FILE_2 = BASE_DIR + 'train.csv.1.cache.pkl'
 TEST_DATA_CACHE_FILE_1 = BASE_DIR + 'test.csv.1.cache.pkl'
 TEST_DATA_CACHE_FILE_2 = BASE_DIR + 'test.csv.2.cache.pkl'
+TOKENIZE_CACHE_FILE = BASE_DIR + 'tokenize.cache.pkl'
 
 TRAIN_DATA_LEAK_FILE = BASE_DIR + 'train.csv.leak.pkl'
 TEST_DATA_LEAK_FILE = BASE_DIR + 'test.csv.leak.pkl'
@@ -76,12 +77,6 @@ def calculate_glove_texts():
         return joblib.load(TRAIN_DATA_CACHE_FILE_1), joblib.load(TRAIN_DATA_CACHE_FILE_2), \
                joblib.load(TEST_DATA_CACHE_FILE_1), joblib.load(TEST_DATA_CACHE_FILE_2)
 
-
-    ########################################
-    ## index word vectors
-    ########################################
-    print('Indexing word vectors')
-    embeddings_index = gensim.models.KeyedVectors.load_word2vec_format(EMBEDDING_FILE, binary=True)
 
     ########################################
     ## process texts in datasets
@@ -176,27 +171,35 @@ def calculate_glove_texts():
     joblib.dump(test_texts_2, TEST_DATA_CACHE_FILE_2)
     return texts_1, texts_2, test_texts_1, test_texts_2
 
-texts_1, texts_2, test_texts_1, test_texts_2 = calculate_glove_texts()
-tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
-tokenizer.fit_on_texts(texts_1 + texts_2 + test_texts_1 + test_texts_2)
 
-sequences_1 = tokenizer.texts_to_sequences(texts_1)
-sequences_2 = tokenizer.texts_to_sequences(texts_2)
-test_sequences_1 = tokenizer.texts_to_sequences(test_texts_1)
-test_sequences_2 = tokenizer.texts_to_sequences(test_texts_2)
+def tokenize():
+    if os.path.exists(TOKENIZE_CACHE_FILE):
+        print("Tokenization results are already cached :)", file=sys.stderr)
+        return joblib.load(TOKENIZE_CACHE_FILE)
+    texts_1, texts_2, test_texts_1, test_texts_2 = calculate_glove_texts()
+    tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
+    tokenizer.fit_on_texts(texts_1 + texts_2 + test_texts_1 + test_texts_2)
+    sequences_1 = tokenizer.texts_to_sequences(texts_1)
+    sequences_2 = tokenizer.texts_to_sequences(texts_2)
+    test_sequences_1 = tokenizer.texts_to_sequences(test_texts_1)
+    test_sequences_2 = tokenizer.texts_to_sequences(test_texts_2)
+    joblib.dump((sequences_1, sequences_2, test_sequences_1, test_sequences_2, tokenizer), TOKENIZE_CACHE_FILE)
+    return sequences_1, sequences_2, test_sequences_1, test_sequences_2, tokenizer
+
+sequences_1, sequences_2, test_sequences_1, test_sequences_2, tokenizer = tokenize()
 
 word_index = tokenizer.word_index
 print('Found %s unique tokens' % len(word_index))
 
 data_1 = pad_sequences(sequences_1, maxlen=MAX_SEQUENCE_LENGTH)
 data_2 = pad_sequences(sequences_2, maxlen=MAX_SEQUENCE_LENGTH)
-labels = np.array(labels)
+labels = np.array(pd.read_csv(TRAIN_DATA_FILE).is_duplicate.astype(int).tolist())
 print('Shape of data tensor:', data_1.shape)
 print('Shape of label tensor:', labels.shape)
 
 test_data_1 = pad_sequences(test_sequences_1, maxlen=MAX_SEQUENCE_LENGTH)
 test_data_2 = pad_sequences(test_sequences_2, maxlen=MAX_SEQUENCE_LENGTH)
-test_ids = np.array(test_ids)
+test_ids = np.array(pd.read_csv(TEST_DATA_FILE).test_id.astype(int).tolist())
 
 
 ########################################
@@ -253,7 +256,7 @@ test_leaks = ss.transform(test_leaks)
 print('Preparing embedding matrix')
 
 nb_words = min(MAX_NB_WORDS, len(word_index)) + 1
-
+embeddings_index = gensim.models.KeyedVectors.load_word2vec_format(EMBEDDING_FILE, binary=True)
 embedding_matrix = np.zeros((nb_words, EMBEDDING_DIM))
 for word, i in word_index.items():
     embedding_vector = embeddings_index.get(word)
