@@ -83,8 +83,6 @@ def calculate_glove_texts():
     print('Indexing word vectors')
     embeddings_index = gensim.models.KeyedVectors.load_word2vec_format(EMBEDDING_FILE, binary=True)
 
-    print('Found %d word vectors of glove.' % len(embeddings_index))
-
     ########################################
     ## process texts in datasets
     ########################################
