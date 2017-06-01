@@ -9,33 +9,27 @@ Single model may achieve LB scores at around 0.18+, average ensembles can get 0.
 ########################################
 ## import packages
 ########################################
+import codecs
+import csv
 import os
 import re
-import csv
-import codecs
+import sys
+from collections import defaultdict
 
 import gensim
 import joblib
 import numpy as np
 import pandas as pd
-
-from string import punctuation
-from collections import defaultdict
-
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.layers import Dense, Input, LSTM, Embedding, Dropout
+from keras.layers.merge import concatenate
+from keras.layers.normalization import BatchNormalization
+from keras.models import Model
+from keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.text import Tokenizer
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
-
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
-from keras.layers import Dense, Input, LSTM, Embedding, Dropout, Activation
-from keras.layers.merge import concatenate
-from keras.models import Model
-from keras.layers.normalization import BatchNormalization
-from keras.callbacks import EarlyStopping, ModelCheckpoint
-
 from sklearn.preprocessing import StandardScaler
-
-import sys
 
 ########################################
 ## set directories and parameters
@@ -260,8 +254,10 @@ embeddings_index = gensim.models.KeyedVectors.load_word2vec_format(EMBEDDING_FIL
 embedding_matrix = np.zeros((nb_words, EMBEDDING_DIM))
 for word, i in word_index.items():
     embedding_vector = embeddings_index[word]
-    if embedding_vector is not None:
+    try:
         embedding_matrix[i] = embedding_vector
+    except:
+        continue
 print('Null word embeddings: %d' % np.sum(np.sum(embedding_matrix, axis=1) == 0))
 
 ########################################
