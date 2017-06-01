@@ -259,7 +259,7 @@ nb_words = min(MAX_NB_WORDS, len(word_index)) + 1
 embeddings_index = gensim.models.KeyedVectors.load_word2vec_format(EMBEDDING_FILE, binary=True)
 embedding_matrix = np.zeros((nb_words, EMBEDDING_DIM))
 for word, i in word_index.items():
-    embedding_vector = embeddings_index.get(word)
+    embedding_vector = embeddings_index[word]
     if embedding_vector is not None:
         embedding_matrix[i] = embedding_vector
 print('Null word embeddings: %d' % np.sum(np.sum(embedding_matrix, axis=1) == 0))
