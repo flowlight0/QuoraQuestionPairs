@@ -14,6 +14,7 @@ import re
 import csv
 import codecs
 
+import gensim
 import joblib
 import numpy as np
 import pandas as pd
@@ -40,7 +41,7 @@ import sys
 ## set directories and parameters
 ########################################
 BASE_DIR = os.path.join(os.path.dirname(__file__), '../data/input/')
-EMBEDDING_FILE = BASE_DIR + 'glove.840B.300d.txt'
+EMBEDDING_FILE = BASE_DIR + 'glove.840B.300d.bin'
 TRAIN_DATA_FILE = BASE_DIR + 'train.csv'
 TEST_DATA_FILE = BASE_DIR + 'test.csv'
 
@@ -80,16 +81,7 @@ def calculate_glove_texts():
     ## index word vectors
     ########################################
     print('Indexing word vectors')
-
-    embeddings_index = {}
-    f = open(EMBEDDING_FILE)
-    count = 0
-    for line in f:
-        values = line.split()
-        word = values[0]
-        coefs = np.asarray(values[1:], dtype='float32')
-        embeddings_index[word] = coefs
-    f.close()
+    embeddings_index = gensim.models.KeyedVectors.load_word2vec_format(EMBEDDING_FILE, binary=True)
 
     print('Found %d word vectors of glove.' % len(embeddings_index))
 
