@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.metrics import log_loss
 from sklearn.model_selection import StratifiedKFold
 
-import lightgbm as lgb
+import xgboost as xgb
 from models.utils import common_model_parser, calculate_statistics
 
 
@@ -49,30 +49,32 @@ def main():
             w_valid = np.ones(X_valid.shape[0])
             w_valid[y_valid == 0] *= negative_weight
 
-            d_train = lgb.Dataset(data=X_train, label=y_train, weight=w_train,
-                                  categorical_feature=categorical_feature_columns)
-            d_valid = lgb.Dataset(data=X_valid, label=y_valid, weight=w_valid,
-                                  categorical_feature=categorical_feature_columns)
-            params = config['model']['params']
-            gbm = lgb.train(params['booster'], d_train, valid_sets=d_valid, **params['train'])
-            models.append(gbm)
+            d_train = xgb.DMatrix(X_train, label=y_train, weight=w_train)
+            d_valid = xgb.DMatrix(X_valid, label=y_valid, weight=w_valid)
 
-            p_train = gbm.predict(X_train, num_iteration=gbm.best_iteration)
-            p_valid = gbm.predict(X_valid, num_iteration=gbm.best_iteration)
+            watchlist = [(d_train, 'train'), (d_valid, 'valid')]
+            params = config['model']['params']
+            bst = xgb.train(params=params['booster'], dtrain=d_train, evals=watchlist, **params['train'])
+            models.append(bst)
+
+            p_train = bst.predict(d_train)
+            p_valid = bst.predict(d_valid)
             data.ix[valid, 'prediction'] = p_valid
            
             stat = calculate_statistics(pred=p_valid, true=y_valid, weight=w_valid)
             stat['results']['train_log_loss'] = log_loss(y_train, p_train, sample_weight=w_train)
             stats["results"].append(stat["results"])
+        stats['sum_log_loss'] = sum(stat['log_loss'] for stat in stats['results'])
         joblib.dump(models, options.model_file)
         data[['prediction']].to_csv(options.model_file + '.train.pred', index=False)
         json.dump(stats, open(options.log_file, 'w'), sort_keys=True, indent=4)
     else:
         models = joblib.load(options.model_file)
+        d_data = xgb.DMatrix(data[feature_columns])
         data['is_duplicate'] = np.zeros(data.shape[0])
         preds = np.zeros((data.shape[0], len(models)))
-        for i, gbm in enumerate(models):
-            preds[:, i] = gbm.predict(data[feature_columns])
+        for i, bst in enumerate(models):
+            preds[:, i] = bst.predict(d_data)
         data['is_duplicate'] = preds.mean(axis=1)
         data[['is_duplicate']].to_csv(options.submission_file, index_label='test_id')
 

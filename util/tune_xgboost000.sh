@@ -1,0 +1,9 @@
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1000.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1001.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1002.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1003.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1004.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1005.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1006.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1007.json
+PYTHONPATH=. python run.py --train_only --config_file config/xgb_cross_1008.json
