@@ -36,8 +36,8 @@ from sklearn.preprocessing import StandardScaler
 ########################################
 BASE_DIR = os.path.join(os.path.dirname(__file__), '../data/input/')
 EMBEDDING_FILE = BASE_DIR + 'glove.840B.300d.bin'
-TRAIN_DATA_FILE = BASE_DIR + 'train.csv'
-TEST_DATA_FILE = BASE_DIR + 'test.csv'
+TRAIN_DATA_FILE = BASE_DIR + 'small_sample_train.csv'
+TEST_DATA_FILE = BASE_DIR + 'small_sample_test.csv'
 
 TRAIN_DATA_CACHE_FILE_1 = BASE_DIR + 'train.csv.1.cache.pkl'
 TRAIN_DATA_CACHE_FILE_2 = BASE_DIR + 'train.csv.1.cache.pkl'
@@ -301,8 +301,9 @@ sequence_2_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
 embedded_sequences_2 = embedding_layer(sequence_2_input)
 y1 = lstm_layer(embedded_sequences_2)
 
+print(leaks.shape[1])
 leaks_input = Input(shape=(leaks.shape[1],))
-leaks_dense = Dense(num_dense / 2, activation=act)(leaks_input)
+leaks_dense = Dense(num_dense // 2, activation=act)(leaks_input)
 
 merged = concatenate([x1, y1, leaks_dense])
 merged = BatchNormalization()(merged)
