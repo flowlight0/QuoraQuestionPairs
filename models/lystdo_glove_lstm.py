@@ -40,7 +40,7 @@ TRAIN_DATA_FILE = BASE_DIR + 'train.csv'
 TEST_DATA_FILE = BASE_DIR + 'test.csv'
 
 TRAIN_DATA_CACHE_FILE_1 = BASE_DIR + 'train.csv.1.cache.pkl'
-TRAIN_DATA_CACHE_FILE_2 = BASE_DIR + 'train.csv.1.cache.pkl'
+TRAIN_DATA_CACHE_FILE_2 = BASE_DIR + 'train.csv.2.cache.pkl'
 TEST_DATA_CACHE_FILE_1 = BASE_DIR + 'test.csv.1.cache.pkl'
 TEST_DATA_CACHE_FILE_2 = BASE_DIR + 'test.csv.2.cache.pkl'
 TOKENIZE_CACHE_FILE = BASE_DIR + 'tokenize.cache.pkl'
@@ -64,6 +64,7 @@ re_weight = True  # whether to re-weight classes to fit the 17.5% share in test 
 STAMP = 'lstm_%d_%d_%.2f_%.2f_%d' % (num_lstm, num_dense, rate_drop_lstm, rate_drop_dense, MAX_SEQUENCE_LENGTH)
 print(STAMP)
 
+
 def calculate_glove_texts():
     if os.path.exists(TRAIN_DATA_CACHE_FILE_1) and os.path.exists(TRAIN_DATA_CACHE_FILE_2) and \
             os.path.exists(TEST_DATA_CACHE_FILE_1) and os.path.exists(TEST_DATA_CACHE_FILE_2):
@@ -71,12 +72,10 @@ def calculate_glove_texts():
         return joblib.load(TRAIN_DATA_CACHE_FILE_1), joblib.load(TRAIN_DATA_CACHE_FILE_2), \
                joblib.load(TEST_DATA_CACHE_FILE_1), joblib.load(TEST_DATA_CACHE_FILE_2)
 
-
     ########################################
     ## process texts in datasets
     ########################################
     print('Processing text dataset')
-
 
     # The function "text_to_wordlist" is from
     # https://www.kaggle.com/currie32/quora-question-pairs/the-importance-of-cleaning-text
@@ -132,8 +131,7 @@ def calculate_glove_texts():
             text = " ".join(stemmed_words)
 
         # Return a list of words
-        return (text)
-
+        return text
 
     texts_1 = []
     texts_2 = []
@@ -180,6 +178,7 @@ def tokenize():
     joblib.dump((sequences_1, sequences_2, test_sequences_1, test_sequences_2, tokenizer), TOKENIZE_CACHE_FILE)
     return sequences_1, sequences_2, test_sequences_1, test_sequences_2, tokenizer
 
+
 sequences_1, sequences_2, test_sequences_1, test_sequences_2, tokenizer = tokenize()
 
 word_index = tokenizer.word_index
@@ -208,7 +207,8 @@ def calculate_leak_tables():
     train_df = pd.read_csv(TRAIN_DATA_FILE)
     test_df = pd.read_csv(TEST_DATA_FILE)
 
-    ques = pd.concat([train_df[['question1', 'question2']], test_df[['question1', 'question2']]], axis=0).reset_index(drop='index')
+    ques = pd.concat([train_df[['question1', 'question2']], test_df[['question1', 'question2']]], axis=0).reset_index(
+        drop='index')
     q_dict = defaultdict(set)
     for i in range(ques.shape[0]):
         q_dict[ques.question1[i]].add(ques.question2[i])
