@@ -265,7 +265,7 @@ print('Null word embeddings: %d' % np.sum(np.sum(embedding_matrix, axis=1) == 0)
 skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=114514)
 bst_val_scores = []
 test_preds = np.zeros(test_df.shape[0])
-train_df['prediction'] = np.zeros(test_df.shape[0])
+train_df['prediction'] = np.zeros(train_df.shape[0])
 
 for idx_train, idx_val in skf.split(X=train_df, y=labels):
     ########################################
