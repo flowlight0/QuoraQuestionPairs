@@ -37,8 +37,8 @@ from sklearn.preprocessing import StandardScaler
 ########################################
 BASE_DIR = os.path.join(os.path.dirname(__file__), '../data/input/')
 EMBEDDING_FILE = BASE_DIR + 'glove.840B.300d.bin'
-TRAIN_DATA_FILE = BASE_DIR + 'small_sample_train.csv'
-TEST_DATA_FILE = BASE_DIR + 'small_sample_test.csv'
+TRAIN_DATA_FILE = BASE_DIR + 'train.csv'
+TEST_DATA_FILE = BASE_DIR + 'test.csv'
 
 TRAIN_DATA_CACHE_FILE_1 = BASE_DIR + 'train.csv.1.cache.pkl'
 TRAIN_DATA_CACHE_FILE_2 = BASE_DIR + 'train.csv.2.cache.pkl'
@@ -61,7 +61,7 @@ rate_drop_dense = 0.15 + np.random.rand() * 0.25
 act = 'relu'
 re_weight = True  # whether to re-weight classes to fit the 17.5% share in test set
 
-STAMP = 'lstm_%d_%d_%.2f_%.2f_%d' % (num_lstm, num_dense, rate_drop_lstm, rate_drop_dense, MAX_SEQUENCE_LENGTH)
+STAMP = 'lstm_without_leak_%d_%d_%.2f_%.2f_%d' % (num_lstm, num_dense, rate_drop_lstm, rate_drop_dense, MAX_SEQUENCE_LENGTH)
 print(STAMP)
 
 
