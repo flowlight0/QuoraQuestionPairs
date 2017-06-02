@@ -46,8 +46,6 @@ TEST_DATA_CACHE_FILE_1 = BASE_DIR + 'test.csv.1.cache.pkl'
 TEST_DATA_CACHE_FILE_2 = BASE_DIR + 'test.csv.2.cache.pkl'
 TOKENIZE_CACHE_FILE = BASE_DIR + 'tokenize.cache.pkl'
 
-TRAIN_DATA_LEAK_FILE = BASE_DIR + 'train.csv.leak.pkl'
-TEST_DATA_LEAK_FILE = BASE_DIR + 'test.csv.leak.pkl'
 
 MAX_SEQUENCE_LENGTH = 30
 MAX_NB_WORDS = 200000
@@ -63,7 +61,7 @@ rate_drop_dense = 0.15 + np.random.rand() * 0.25
 act = 'relu'
 re_weight = True  # whether to re-weight classes to fit the 17.5% share in test set
 
-STAMP = 'lstm_%d_%d_%.2f_%.2f_%d' % (num_lstm, num_dense, rate_drop_lstm, rate_drop_dense, MAX_SEQUENCE_LENGTH)
+STAMP = 'lstm_without_leak_%d_%d_%.2f_%.2f_%d' % (num_lstm, num_dense, rate_drop_lstm, rate_drop_dense, MAX_SEQUENCE_LENGTH)
 print(STAMP)
 
 
@@ -197,54 +195,7 @@ test_data_2 = pad_sequences(test_sequences_2, maxlen=MAX_SEQUENCE_LENGTH)
 test_ids = np.array(pd.read_csv(TEST_DATA_FILE).test_id.astype(int).tolist())
 
 
-########################################
-# generate leaky features
-########################################
-
-def calculate_leak_tables():
-    if os.path.exists(TRAIN_DATA_LEAK_FILE) and os.path.exists(TEST_DATA_LEAK_FILE):
-        print("Leak features are already cached :)", file=sys.stderr)
-        return joblib.load(TRAIN_DATA_LEAK_FILE), joblib.load(TEST_DATA_LEAK_FILE)
-
-    train_df = pd.read_csv(TRAIN_DATA_FILE)
-    test_df = pd.read_csv(TEST_DATA_FILE)
-
-    ques = pd.concat([train_df[['question1', 'question2']], test_df[['question1', 'question2']]], axis=0).reset_index(
-        drop='index')
-    q_dict = defaultdict(set)
-    for i in range(ques.shape[0]):
-        q_dict[ques.question1[i]].add(ques.question2[i])
-        q_dict[ques.question2[i]].add(ques.question1[i])
-
-    def q1_freq(row):
-        return len(q_dict[row['question1']])
-
-    def q2_freq(row):
-        return len(q_dict[row['question2']])
-
-    def q1_q2_intersect(row):
-        return len(set(q_dict[row['question1']]).intersection(set(q_dict[row['question2']])))
-
-    train_df['q1_q2_intersect'] = train_df.apply(q1_q2_intersect, axis=1, raw=True)
-    train_df['q1_freq'] = train_df.apply(q1_freq, axis=1, raw=True)
-    train_df['q2_freq'] = train_df.apply(q2_freq, axis=1, raw=True)
-
-    test_df['q1_q2_intersect'] = test_df.apply(q1_q2_intersect, axis=1, raw=True)
-    test_df['q1_freq'] = test_df.apply(q1_freq, axis=1, raw=True)
-    test_df['q2_freq'] = test_df.apply(q2_freq, axis=1, raw=True)
-    joblib.dump(train_df, TRAIN_DATA_LEAK_FILE)
-    joblib.dump(test_df, TEST_DATA_LEAK_FILE)
-    return train_df, test_df
-
-
-train_df, test_df = calculate_leak_tables()
-leaks = train_df[['q1_q2_intersect', 'q1_freq', 'q2_freq']]
-test_leaks = test_df[['q1_q2_intersect', 'q1_freq', 'q2_freq']]
-
-ss = StandardScaler()
-ss.fit(np.vstack((leaks, test_leaks)))
-leaks = ss.transform(leaks)
-test_leaks = ss.transform(test_leaks)
+train_df, test_df = pd.read_csv(TRAIN_DATA_FILE), pd.read_csv(TEST_DATA_FILE)
 
 ########################################
 # prepare embeddings
@@ -273,12 +224,10 @@ for idx_train, idx_val in skf.split(X=train_df, y=labels):
     ########################################
     data_1_train = np.vstack((data_1[idx_train], data_2[idx_train]))
     data_2_train = np.vstack((data_2[idx_train], data_1[idx_train]))
-    leaks_train = np.vstack((leaks[idx_train], leaks[idx_train]))
     labels_train = np.concatenate((labels[idx_train], labels[idx_train]))
 
     data_1_val = np.vstack((data_1[idx_val], data_2[idx_val]))
     data_2_val = np.vstack((data_2[idx_val], data_1[idx_val]))
-    leaks_val = np.vstack((leaks[idx_val], leaks[idx_val]))
     labels_val = np.concatenate((labels[idx_val], labels[idx_val]))
 
     weight_val = np.ones(len(labels_val))
@@ -304,11 +253,7 @@ for idx_train, idx_val in skf.split(X=train_df, y=labels):
     embedded_sequences_2 = embedding_layer(sequence_2_input)
     y1 = lstm_layer(embedded_sequences_2)
 
-    print(leaks.shape[1])
-    leaks_input = Input(shape=(leaks.shape[1],))
-    leaks_dense = Dense(num_dense // 2, activation=act)(leaks_input)
-
-    merged = concatenate([x1, y1, leaks_dense])
+    merged = concatenate([x1, y1])
     merged = BatchNormalization()(merged)
     merged = Dropout(rate_drop_dense)(merged)
 
@@ -329,7 +274,7 @@ for idx_train, idx_val in skf.split(X=train_df, y=labels):
     ########################################
     # train the model
     ########################################
-    model = Model(inputs=[sequence_1_input, sequence_2_input, leaks_input], outputs=preds)
+    model = Model(inputs=[sequence_1_input, sequence_2_input], outputs=preds)
     model.compile(loss='binary_crossentropy',
                   optimizer='nadam',
                   metrics=['acc'])
@@ -340,8 +285,8 @@ for idx_train, idx_val in skf.split(X=train_df, y=labels):
     bst_model_path = STAMP + '.h5'
     model_checkpoint = ModelCheckpoint(bst_model_path, save_best_only=True, save_weights_only=True)
 
-    hist = model.fit([data_1_train, data_2_train, leaks_train], labels_train,
-                     validation_data=([data_1_val, data_2_val, leaks_val], labels_val, weight_val),
+    hist = model.fit([data_1_train, data_2_train], labels_train,
+                     validation_data=([data_1_val, data_2_val], labels_val, weight_val),
                      epochs=200, batch_size=2048, shuffle=True,
                      class_weight=class_weight, callbacks=[early_stopping, model_checkpoint])
 
@@ -353,13 +298,13 @@ for idx_train, idx_val in skf.split(X=train_df, y=labels):
     # make the submission
     ########################################
     print('Start making prediction on test dataset')
-    internal_test_preds = model.predict([test_data_1, test_data_2, test_leaks], batch_size=8192, verbose=1)
-    internal_test_preds += model.predict([test_data_2, test_data_1, test_leaks], batch_size=8192, verbose=1)
+    internal_test_preds = model.predict([test_data_1, test_data_2], batch_size=8192, verbose=1)
+    internal_test_preds += model.predict([test_data_2, test_data_1], batch_size=8192, verbose=1)
     internal_test_preds /= 2
     test_preds += internal_test_preds.ravel() / N_SPLITS
 
-    val_preds = model.predict([data_1[idx_val], data_2[idx_val], leaks[idx_val]], batch_size=8192, verbose=1)
-    val_preds += model.predict([data_2[idx_val], data_1[idx_val], leaks[idx_val]], batch_size=8192, verbose=1)
+    val_preds = model.predict([data_1[idx_val], data_2[idx_val]], batch_size=8192, verbose=1)
+    val_preds += model.predict([data_2[idx_val], data_1[idx_val]], batch_size=8192, verbose=1)
     val_preds /= 2
     train_df.ix[idx_val, 'prediction'] = val_preds.ravel()
 
