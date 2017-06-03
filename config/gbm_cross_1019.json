@@ -1,0 +1,129 @@
+{
+  "data_prefix": "data/input/",
+  "features": [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 21, 22, 28, 30,
+    31, 32, 44, 45, 46, 47, 57, 60, 64, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 91, 92, 93, 109, 110, 111, 112,
+    117, 118, 119, 137, 145, 146, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168,
+    1000, 1001, 1002, 1003, 1004, 1013, 1018, 1026, 1027, 1028, 1029, 1030],
+    "takapt_features": [
+    "z_noun_match",
+    "z_word_match",
+    "z_word_match_idf",
+    "z_n_sim",
+
+    "common_words_lemm",
+    "n_sim_lemm",
+    "n_sim_lemm_stop",
+    "s2v_sum_dist",
+    "s2v_ave_dist",
+
+    "sum_prob_weight_common_words",
+    "sum_prob_weight_uncommon_words",
+    "top_similarity",
+    "min_sim",
+    "max_sim",
+
+    "common_bigrams_clean_lemm",
+    "jaccard_common_bigrams_clean_lemm",
+    "nazo_common_bigrams_clean_lemm",
+
+    "sum_weight_common_bigrams",
+    "sum_weight_common_bigrams_limit3",
+
+    "common_ngrams_clean_lemm",
+    "jaccard_common_ngrams_clean_lemm",
+    "nazo_common_ngrams_clean_lemm",
+
+    "clean_lemm_wmd",
+
+    "bleu_clean_lemm_stem_q1q2",
+    "bleu_clean_lemm_stem_q2q1",
+    "bleu_clean_lemm_q1q2",
+    "bleu_clean_lemm_q2q1",
+
+    "norm_sum_prob_weight_common_words",
+
+    "sum_prob_weight_common_words_thresh_0.20",
+    "sum_prob_weight_common_words_thresh_0.30",
+    "sum_prob_weight_common_words_thresh_0.40",
+    "sum_prob_weight_common_words_thresh_0.50",
+    "sum_prob_weight_common_words_thresh_0.60",
+    "sum_prob_weight_common_words_thresh_0.70",
+    "sum_prob_weight_common_words_thresh_0.80",
+    "sum_prob_weight_common_words_thresh_0.90",
+    "sum_prob_weight_common_words_thresh_0.95",
+    "sum_prob_weight_uncommon_words_thresh_0.20",
+    "sum_prob_weight_uncommon_words_thresh_0.30",
+    "sum_prob_weight_uncommon_words_thresh_0.40",
+    "sum_prob_weight_uncommon_words_thresh_0.50",
+    "sum_prob_weight_uncommon_words_thresh_0.60",
+    "sum_prob_weight_uncommon_words_thresh_0.70",
+    "sum_prob_weight_uncommon_words_thresh_0.80",
+    "sum_prob_weight_uncommon_words_thresh_0.90",
+    "sum_prob_weight_uncommon_words_thresh_0.95",
+
+    "sum_prob_weight_common_words_spacy_thresh_0.20",
+    "sum_prob_weight_common_words_spacy_thresh_0.30",
+    "sum_prob_weight_common_words_spacy_thresh_0.40",
+    "sum_prob_weight_common_words_spacy_thresh_0.50",
+    "sum_prob_weight_common_words_spacy_thresh_0.60",
+    "sum_prob_weight_common_words_spacy_thresh_0.70",
+    "sum_prob_weight_common_words_spacy_thresh_0.80",
+    "sum_prob_weight_common_words_spacy_thresh_0.90",
+    "sum_prob_weight_common_words_spacy_thresh_0.95",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.20",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.30",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.40",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.50",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.60",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.70",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.80",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.90",
+    "sum_prob_weight_uncommon_words_spacy_thresh_0.95",
+
+    "n_sim_lemm_spacy",
+    "n_sim_lemm_stop_spacy",
+
+    "q1_words_not_in_word2vec",
+    "q2_words_not_in_word2vec",
+
+    "uncommon_not_in_word2vec",
+
+    "clean_lemm_stem_len1",
+    "clean_lemm_stem_len2",
+    "clean_lemm_stem_word_len1",
+    "clean_lemm_stem_word_len2",
+    "clean_lemm_stem_match_ratio",
+    "clean_lemm_stem_word_match",
+    "clean_lemm_stem_word_match_idf",
+    "clean_lemm_stem_tfidf_sum1",
+    "clean_lemm_stem_tfidf_sum2",
+    "clean_lemm_stem_tfidf_mean1",
+    "clean_lemm_stem_tfidf_mean2",
+    "clean_lemm_stem_tfidf_len1",
+    "clean_lemm_stem_tfidf_len2"
+  ],
+  "model": {
+    "path": "models/1001_lightgbm_cross.py",
+    "target_positive_ratio": 0.17426506525171756,
+    "params": {
+      "booster": {
+        "task": "train",
+        "objective": "binary",
+        "metric": "binary_logloss",
+        "num_leaves": 256,
+        "min_gain_to_split": 0.1,
+        "learning_rate": 0.02,
+        "feature_fraction": 0.7,
+        "feature_fraction_seed": 2,
+        "bagging_fraction": 0.7,
+        "bagging_freq": 5,
+        "bagging_seed": 3
+      },
+      "train": {
+        "num_boost_round": 3000,
+        "early_stopping_rounds": 50,
+        "verbose_eval": 10
+      }
+    }
+  }
+}
