@@ -1,5 +1,6 @@
-from ffmutil import create_ffm_file, train, predict, FFMCV
+import pandas as pd
 
+from ffmutil import FFMCV
 
 fields = [
     '1grams_stem_q1',
@@ -17,7 +18,10 @@ fields = [
 
 def main():
     ffmcv = FFMCV('ffm_001')
-    ffmcv.train(fields)
+    preds = ffmcv.train(fields)
+    train_pred = pd.DataFrame()
+    train_pred['ffm_001'] = preds
+    train_pred.to_csv('../data/working/10000_train.csv', index=False)
 
 if __name__ == '__main__':
     main()

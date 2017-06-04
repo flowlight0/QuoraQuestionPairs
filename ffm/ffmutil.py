@@ -74,7 +74,7 @@ def create_ffm_file(train_or_test, fields, ffm_filename):
 
 
 def train(model_name, train_ffm_file, validation_ffm_file):
-    model_filepath = os.path.join(FFM_WORK_DIR, model_name, '.model')
+    model_filepath = os.path.join(FFM_WORK_DIR, model_name + '.model')
     subprocess.call([
         os.path.join(LIBFFM_DIR, 'ffm-train'),
         '-s', '12',
@@ -86,13 +86,12 @@ def train(model_name, train_ffm_file, validation_ffm_file):
     return model_filepath
 
 
-def predict(model_name, test_ffm_file):
-    output_filepath = os.path.join(FFM_WORK_DIR, model_name + '.pred')
-    print(output_filepath)
+def predict(model_filepath, test_ffm_file):
+    output_filepath = os.path.join(FFM_WORK_DIR, 'temp.pred')
     subprocess.call([
         os.path.join(LIBFFM_DIR, 'ffm-predict'),
         test_ffm_file,
-        os.path.join(FFM_WORK_DIR, model_name, '.model'),
+        model_filepath,
         output_filepath
     ])
     return pd.read_csv(output_filepath, header=None, names=['pred']).pred.tolist()
@@ -109,15 +108,15 @@ class FFMCV:
 
         with open(ffm_filepath) as f:
             lines = f.readlines()
-        train = pd.read_csv('../data/input/train.csv')
-        assert(len(lines) == len(train))
+        train_df = pd.read_csv('../data/input/train.csv')
+        assert(len(lines) == len(train_df))
 
         def write_sub_lines(filepath, index):
-            sub_lines = [lines[i] + '\n' for i in index]
+            sub_lines = [lines[i] for i in index]
             with open(filepath, 'w') as f:
                 f.writelines(sub_lines)
 
-        y = train.is_duplicate
+        y = train_df.is_duplicate
         skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=114514)
         self.cv_infos = []
         for i, (train_index, valid_index) in enumerate(skf.split(np.zeros(len(y)), y)):
@@ -134,15 +133,24 @@ class FFMCV:
                 'valid_index': valid_index
             })
 
-    def __do_cv(self):
+    def __do_train_cv(self):
+        train_df = pd.read_csv('../data/input/train.csv')
+
         self.model_filepaths = []
-        for i, cv_infos in enumerate(self.cv_infos):
-            model_filepath = train(self.model_name + str(i), cv_infos['train_filepath'], cv_infos['valid_filepath'])
+        preds = [-1] * len(train_df)
+        for cv_i, cv_infos in enumerate(self.cv_infos):
+            model_filepath = train(self.model_name + str(cv_i), cv_infos['train_filepath'], cv_infos['valid_filepath'])
             self.model_filepaths.append(model_filepath)
+
+            pre = predict(model_filepath, cv_infos['valid_filepath'])
+            for i, p in zip(cv_infos['valid_index'], pre):
+                preds[i] = p
+        return preds
 
     def train(self, fields):
         self.__generate_cv_data(fields)
-        self.__do_cv()
+        preds = self.__do_train_cv()
+        return preds
 
     def predict(self, test_ffm_file):
         return predict(self.model_name, test_ffm_file)
