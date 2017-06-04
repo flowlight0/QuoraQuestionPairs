@@ -7,7 +7,7 @@ from ffmutil import create_ffm_field_file
 
 class NgramFFMFeatureCreator:
     def __init__(self, ngram):
-        self.vectorizer = CountVectorizer(min_df=4, ngram_range=(ngram, ngram))
+        self.vectorizer = CountVectorizer(min_df=200, ngram_range=(ngram, ngram))
 
     def fit(self, qs):
         self.vectorizer.fit(qs)
