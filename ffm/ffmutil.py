@@ -153,5 +153,8 @@ class FFMCV:
         return preds
 
     def predict(self, test_ffm_file):
-        return predict(self.model_name, test_ffm_file)
-
+        preds = []
+        for model_filepath in self.model_filepaths:
+            preds.append(predict(model_filepath, test_ffm_file))
+        mean_p = np.array(preds).transpose().mean(axis=1)
+        return mean_p
