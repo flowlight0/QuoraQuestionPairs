@@ -157,7 +157,7 @@ def prepare_graph(options, file_prefix):
 
 
 def main():
-    file_prefix = 'gbm_cross_1013.json.gbm_cross_1013.json'
+    file_prefix = 'gbm_cross_1044.json.gbm_cross_1044.json'
     options = common_feature_parser().parse_args()
     neighbor_sets, neighbor_weights = prepare_graph(options, file_prefix)
     for k, file_name in generate_filename_from_prefix(options.data_prefix):

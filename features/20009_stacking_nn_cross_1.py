@@ -34,7 +34,8 @@ def calculate_q1_q2_intersection_weight_sum(df, neighbor_sets, neighbor_weights)
 
 
 def calculate_q1_q2_intersection_weight_avg(df, neighbor_sets, neighbor_weights):
-    values = np.zeros(df.shape[0])
+    values = np.zeros(df
+                      .shape[0])
     for i, (q1, q2) in tqdm(enumerate(zip(df.question1.astype(str), df.question2.astype(str)))):
         q1_neighbors = neighbor_sets[q1]
         q2_neighbors = neighbor_sets[q2]
@@ -134,11 +135,6 @@ def prepare_graph(options, file_prefix):
     input_files = dict(generate_filename_from_prefix(options.data_prefix))
     train_file = os.path.join(os.path.dirname(input_files['train']), '../output/', file_prefix + '.model.train.pred')
     test_file = os.path.join(os.path.dirname(input_files['train']), '../output/', file_prefix + '.submission.csv')
-    return prepare_graph_with_filenames(options, train_file, test_file)
-
-
-def prepare_graph_with_filenames(options, train_file, test_file):
-    input_files = dict(generate_filename_from_prefix(options.data_prefix))
     print('Stacking ingredients: {} and {}'.format(train_file, test_file), file=sys.stderr)
     neighbor_sets = defaultdict(set)
     neighbor_weights = defaultdict(dict)
@@ -162,12 +158,9 @@ def prepare_graph_with_filenames(options, train_file, test_file):
 
 
 def main():
-    file_prefix = '0.2675_lstm_without_leak_244_144_0.25_0.31_30'
+    file_prefix = 'nn_1.json.nn_1.json'
     options = common_feature_parser().parse_args()
-    input_files = dict(generate_filename_from_prefix(options.data_prefix))
-    train_file = os.path.join(os.path.dirname(input_files['train']), '../lstm/', file_prefix + '.stacking.csv')
-    test_file = os.path.join(os.path.dirname(input_files['train']), '../lstm/', file_prefix + '.submission.csv')
-    neighbor_sets, neighbor_weights = prepare_graph_with_filenames(options, train_file, test_file)
+    neighbor_sets, neighbor_weights = prepare_graph(options, file_prefix)
     for k, file_name in generate_filename_from_prefix(options.data_prefix):
         create_feature(data_file=file_name, neighbor_sets=neighbor_sets, neighbor_weights=neighbor_weights)
 

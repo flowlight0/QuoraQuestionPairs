@@ -162,7 +162,7 @@ def prepare_graph_with_filenames(options, train_file, test_file):
 
 
 def main():
-    file_prefix = '0.2675_lstm_without_leak_244_144_0.25_0.31_30'
+    file_prefix = '0.2727_lstm_without_leak_204_137_0.32_0.39_30'
     options = common_feature_parser().parse_args()
     input_files = dict(generate_filename_from_prefix(options.data_prefix))
     train_file = os.path.join(os.path.dirname(input_files['train']), '../lstm/', file_prefix + '.stacking.csv')

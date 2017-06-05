@@ -34,7 +34,8 @@ def calculate_q1_q2_intersection_weight_sum(df, neighbor_sets, neighbor_weights)
 
 
 def calculate_q1_q2_intersection_weight_avg(df, neighbor_sets, neighbor_weights):
-    values = np.zeros(df.shape[0])
+    values = np.zeros(df
+                      .shape[0])
     for i, (q1, q2) in tqdm(enumerate(zip(df.question1.astype(str), df.question2.astype(str)))):
         q1_neighbors = neighbor_sets[q1]
         q2_neighbors = neighbor_sets[q2]
@@ -157,7 +158,7 @@ def prepare_graph(options, file_prefix):
 
 
 def main():
-    file_prefix = 'xgb_cross_0.json.xgb_cross_0.json'
+    file_prefix = 'xgb_cross_1009.json.xgb_cross_1009.json'
     options = common_feature_parser().parse_args()
     neighbor_sets, neighbor_weights = prepare_graph(options, file_prefix)
     for k, file_name in generate_filename_from_prefix(options.data_prefix):
