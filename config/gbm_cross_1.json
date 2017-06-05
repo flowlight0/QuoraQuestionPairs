@@ -116,7 +116,6 @@
         "lambda_l2": 0.01,
         "learning_rate": 0.02,
         "feature_fraction": 0.5,
-        "feature_fraction_seed": 2,
         "bagging_fraction": 0.7,
         "bagging_freq": 5,
         "bagging_seed": 3,
