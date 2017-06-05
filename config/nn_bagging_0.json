@@ -2,7 +2,7 @@
   "data_prefix": "data/input/",
   "features": [0, 1, 2, 3],
   "model": {
-    "path": "models/6_nn.py",
+    "path": "models/6_nn_bagging.py",
     "target_positive_ratio": 0.174,
     "params": {
 

@@ -103,7 +103,7 @@
     "clean_lemm_stem_tfidf_len2"
   ],
   "model": {
-    "path": "models/6_nn.py",
+    "path": "models/6_nn_bagging.py",
     "target_positive_ratio": 0.174,
     "params": {
 
