@@ -48,6 +48,7 @@ def nn_model(X_train):
     model.compile(loss='binary_crossentropy', optimizer='adadelta')
     return model
 
+
 def calibration(values):
     epsilon = 1e-7
     return np.minimum(1 - epsilon, np.maximum(epsilon, values))
@@ -62,7 +63,6 @@ def main():
 
     if options.train:
         skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=114514)
-        negative_weight = (data.y.sum() / config['model']["target_positive_ratio"] - data.y.sum()) / (data.y == 0).sum()
 
         scalers = []
         stats = {"results": [], "config": config}
@@ -79,24 +79,28 @@ def main():
             w_valid = np.ones(X_valid.shape[0])
             w_valid *= 0.472001959
             w_valid[y_valid == 0] = 1.309028344
-
             scaler = StandardScaler()
             X_train = scaler.fit_transform(X_train.values)
             X_valid = scaler.transform(X_valid.values)
-            model = nn_model(X_train)
-            bst_model_path = options.model_file + '.h5'
-            hist = model.fit(X_train, y_train, validation_data=(X_valid, y_valid, w_valid),
-                             epochs=200, batch_size=2048, shuffle=True,
-                             class_weight=class_weight, callbacks=[EarlyStopping(monitor='val_loss', patience=10),
-                                                                   ModelCheckpoint(bst_model_path, save_best_only=True,
-                                                                                   save_weights_only=True)])
 
-            p_valid = calibration(model.predict(X_valid, batch_size=8192, verbose=1).ravel())
-            p_train = calibration(model.predict(X_train, batch_size=8192, verbose=1).ravel())
-            print(p_valid, p_valid.max())
-            joblib.dump(p_valid, 'tmp.p_valid.pkl')
-            model.save(options.model_file + '.{}.h5'.format(i))
-            scalers.append(scaler)
+            n_bags = 5
+            p_valid = np.zeros(X_valid.shape[0])
+            p_train = np.zeros(X_valid.shape[0])
+            for j in range(n_bags):
+                model = nn_model(X_train)
+                bst_model_path = options.model_file + '.h5'
+                hist = model.fit(X_train, y_train, validation_data=(X_valid, y_valid, w_valid),
+                                 epochs=200, batch_size=2048, shuffle=True,
+                                 class_weight=class_weight, callbacks=[EarlyStopping(monitor='val_loss', patience=10),
+                                                                       ModelCheckpoint(bst_model_path,
+                                                                                       save_best_only=True,
+                                                                                       save_weights_only=True)])
+
+                p_valid += calibration(model.predict(X_valid, batch_size=8192, verbose=1).ravel()) / n_bags
+                p_train += calibration(model.predict(X_train, batch_size=8192, verbose=1).ravel()) / n_bags
+                model.save(options.model_file + '.{}.h5'.format(i * n_bags + j))
+                scalers.append(scaler)
+
             data.ix[valid, 'prediction'] = p_valid
             stat = calculate_statistics(pred=p_valid, true=y_valid, weight=w_valid)
             stat['results']['train_log_loss'] = log_loss(y_train, p_train, sample_weight=w_train)
