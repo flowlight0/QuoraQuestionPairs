@@ -48,6 +48,10 @@ def nn_model(X_train):
     model.compile(loss='binary_crossentropy', optimizer='adadelta')
     return model
 
+def calibration(values):
+    epsilon = 1e-7
+    return np.minimum(1 - epsilon, np.maximum(epsilon, values))
+
 
 def main():
     options = common_model_parser().parse_args()
@@ -70,9 +74,11 @@ def main():
             X_valid, y_valid = valid_data[feature_columns], valid_data['y']
 
             w_train = np.ones(X_train.shape[0])
-            w_train[y_train == 0] *= negative_weight
+            w_train *= 0.472001959
+            w_train[y_train == 0] = 1.309028344
             w_valid = np.ones(X_valid.shape[0])
-            w_valid[y_valid == 0] *= negative_weight
+            w_valid *= 0.472001959
+            w_valid[y_valid == 0] = 1.309028344
 
             scaler = StandardScaler()
             X_train = scaler.fit_transform(X_train.values)
@@ -80,15 +86,15 @@ def main():
             model = nn_model(X_train)
             bst_model_path = options.model_file + '.h5'
             hist = model.fit(X_train, y_train, validation_data=(X_valid, y_valid, w_valid),
-                             epochs=5, batch_size=2048, shuffle=True,
+                             epochs=100, batch_size=2048, shuffle=True,
                              class_weight=class_weight, callbacks=[EarlyStopping(monitor='val_loss', patience=3),
                                                                    ModelCheckpoint(bst_model_path, save_best_only=True,
                                                                                    save_weights_only=True)])
 
-            p_valid = model.predict(X_valid, batch_size=8192, verbose=1).ravel()
-            p_train = model.predict(X_train, batch_size=8192, verbose=1).ravel()
-
-            print(p_valid)
+            p_valid = calibration(model.predict(X_valid, batch_size=8192, verbose=1).ravel())
+            p_train = calibration(model.predict(X_train, batch_size=8192, verbose=1).ravel())
+            print(p_valid, p_valid.max())
+            joblib.dump(p_valid, 'tmp.p_valid.pkl')
             model.save(options.model_file + '.{}.h5'.format(i))
             scalers.append(scaler)
             data.ix[valid, 'prediction'] = p_valid
@@ -96,7 +102,6 @@ def main():
             stat['results']['train_log_loss'] = log_loss(y_train, p_train, sample_weight=w_train)
             print(stat)
             stats["results"].append(stat["results"])
-            break
         joblib.dump(scalers, options.model_file + '.scaler')
         data[['prediction']].to_csv(options.model_file + '.train.pred', index=False)
         print(stats)
@@ -108,7 +113,7 @@ def main():
         for i, scaler in enumerate(scalers):
             model = load_model(options.model_file + '.{}.h5'.format(i))
             X = scaler.transform(data[feature_columns])
-            preds[:, i] = model.predict(X, batch_size=8192, verbose=1).ravel()
+            preds[:, i] = calibration(model.predict(X, batch_size=8192, verbose=1).ravel())
         data['is_duplicate'] = preds.mean(axis=1)
         data[['is_duplicate']].to_csv(options.submission_file, index_label='test_id')
 
