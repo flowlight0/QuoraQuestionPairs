@@ -86,8 +86,8 @@ def main():
             model = nn_model(X_train)
             bst_model_path = options.model_file + '.h5'
             hist = model.fit(X_train, y_train, validation_data=(X_valid, y_valid, w_valid),
-                             epochs=100, batch_size=2048, shuffle=True,
-                             class_weight=class_weight, callbacks=[EarlyStopping(monitor='val_loss', patience=3),
+                             epochs=200, batch_size=2048, shuffle=True,
+                             class_weight=class_weight, callbacks=[EarlyStopping(monitor='val_loss', patience=10),
                                                                    ModelCheckpoint(bst_model_path, save_best_only=True,
                                                                                    save_weights_only=True)])
 
