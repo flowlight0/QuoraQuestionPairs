@@ -84,7 +84,7 @@ def main():
             X_valid = scaler.transform(X_valid.values)
 
             n_bags = 5
-            p_valid = np.zeros(X_valid.shape[0])
+            p_valid = np.zeros(X_train.shape[0])
             p_train = np.zeros(X_valid.shape[0])
             for j in range(n_bags):
                 model = nn_model(X_train)
